@@ -1,0 +1,86 @@
+export const INITIAL_STATS = {
+    earnings: 1250,
+    bookings: 24,
+    rating: 4.8,
+    views: 342,
+};
+
+export const INITIAL_BOOKINGS = [
+    {
+        id: 1,
+        customer: "Alice Johnson",
+        service: "Deep Home Cleaning",
+        date: "2023-10-27",
+        time: "10:00 AM",
+        status: "pending",
+        address: "123 MG Road, Bangalore",
+        price: 80,
+    },
+    {
+        id: 2,
+        customer: "Bob Smith",
+        service: "Carpet Cleaning",
+        date: "2023-10-27",
+        time: "02:00 PM",
+        status: "confirmed",
+        address: "45 Bandra West, Mumbai",
+        price: 120,
+    },
+    {
+        id: 3,
+        customer: "Charlie Brown",
+        service: "Window Washing",
+        date: "2023-10-28",
+        time: "09:00 AM",
+        status: "confirmed",
+        address: "789 Sector 18, Noida",
+        price: 60,
+    },
+    {
+        id: 4,
+        customer: "Diana Prince",
+        service: "Deep Home Cleaning",
+        date: "2023-10-25",
+        time: "11:00 AM",
+        status: "completed",
+        address: "321 Koregaon Park, Pune",
+        price: 80,
+    },
+    {
+        id: 5,
+        customer: "Evan Wright",
+        service: "Gutter Cleaning",
+        date: "2023-10-29",
+        time: "04:00 PM",
+        status: "pending",
+        address: "555 Salt Lake, Kolkata",
+        price: 150,
+    },
+];
+
+export const INITIAL_SERVICES = [
+    {
+        id: 1,
+        name: "Deep Home Cleaning",
+        price: 80,
+        duration: "2h",
+        active: true,
+        description: "Full cleaning of floors, surfaces, and dusting.",
+    },
+    {
+        id: 2,
+        name: "Carpet Cleaning",
+        price: 120,
+        duration: "1.5h",
+        active: true,
+        description: "Steam cleaning for up to 3 rooms.",
+    },
+    {
+        id: 3,
+        name: "Window Washing",
+        price: 60,
+        duration: "1h",
+        active: false,
+        description: "Exterior and interior window cleaning.",
+    },
+];
