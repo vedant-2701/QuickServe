@@ -1,23 +1,39 @@
 import React, { useState } from "react";
-import { Settings } from "lucide-react";
 import {
     INITIAL_STATS,
     INITIAL_BOOKINGS,
     INITIAL_SERVICES,
+    INITIAL_PROFILE,
+    INITIAL_SETTINGS,
 } from "./data/mockData";
 import Sidebar from "./layouts/Sidebar";
 import Header from "./layouts/Header";
 import DashboardView from "./pages/DashboardView";
 import BookingsView from "./pages/BookingsView";
 import ServicesView from "./pages/ServicesView";
+import ProfileView from "./pages/ProfileView";
+import SettingsView from "./pages/SettingsView";
+import AuthPages from "./pages/AuthPages";
 
 export default function App() {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [activeTab, setActiveTab] = useState("dashboard");
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const [stats, setStats] = useState(INITIAL_STATS);
     const [bookings, setBookings] = useState(INITIAL_BOOKINGS);
     const [services, setServices] = useState(INITIAL_SERVICES);
+    const [profile, setProfile] = useState(INITIAL_PROFILE);
+    const [settings, setSettings] = useState(INITIAL_SETTINGS);
+
+    const handleLogin = () => {
+        setIsAuthenticated(true);
+        setActiveTab("dashboard");
+    };
+
+    const handleLogout = () => {
+        setIsAuthenticated(false);
+    };
 
     const handleBookingAction = (id, newStatus) => {
         setBookings((prev) =>
@@ -47,6 +63,11 @@ export default function App() {
         setServices((prev) => prev.filter((s) => s.id !== id));
     };
 
+    // Show Auth page if not authenticated
+    if (!isAuthenticated) {
+        return <AuthPages onLogin={handleLogin} />;
+    }
+
     return (
         <div className="flex h-screen bg-slate-50 font-sans text-slate-900">
             <Sidebar
@@ -55,6 +76,7 @@ export default function App() {
                 isMobileMenuOpen={isMobileMenuOpen}
                 setIsMobileMenuOpen={setIsMobileMenuOpen}
                 bookings={bookings}
+                onLogout={handleLogout}
             />
 
             <div className="flex-1 flex flex-col min-w-0">
@@ -85,18 +107,8 @@ export default function App() {
                             deleteService={deleteService}
                         />
                     )}
-                    {(activeTab === "profile" || activeTab === "settings") && (
-                        <div className="flex flex-col items-center justify-center h-full text-center text-slate-500">
-                            <Settings className="w-16 h-16 text-slate-200 mb-4" />
-                            <h3 className="text-xl font-bold text-slate-700">
-                                Work in Progress
-                            </h3>
-                            <p>
-                                The Profile and Settings modules are coming in
-                                the next sprint.
-                            </p>
-                        </div>
-                    )}
+                    {activeTab === "profile" && <ProfileView profile={profile} setProfile={setProfile} />}
+                    {activeTab === "settings" && <SettingsView settings={settings} setSettings={setSettings} />}
                 </main>
             </div>
 

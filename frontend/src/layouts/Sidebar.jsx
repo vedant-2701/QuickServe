@@ -15,6 +15,7 @@ const Sidebar = ({
     isMobileMenuOpen,
     setIsMobileMenuOpen,
     bookings,
+    onLogout,
 }) => {
     return (
         <aside
@@ -70,8 +71,8 @@ const Sidebar = ({
                             icon: Briefcase,
                             label: "My Services",
                         },
-                        // { id: 'profile', icon: User, label: 'Profile' },
-                        // { id: 'settings', icon: Settings, label: 'Settings' },
+                        { id: "profile", icon: User, label: "Profile" },
+                        { id: "settings", icon: Settings, label: "Settings" },
                     ].map((item) => (
                         <button
                             key={item.id}
@@ -106,7 +107,10 @@ const Sidebar = ({
             </div>
 
             <div className="absolute bottom-0 w-full p-4 border-t border-slate-800">
-                <button className="flex items-center gap-3 text-slate-400 hover:text-white text-sm font-medium w-full p-2 rounded-lg hover:bg-slate-800 transition">
+                <button 
+                    onClick={onLogout}
+                    className="flex items-center gap-3 text-slate-400 hover:text-white text-sm font-medium w-full p-2 rounded-lg hover:bg-slate-800 transition"
+                >
                     <LogOut className="w-5 h-5" /> Sign Out
                 </button>
             </div>

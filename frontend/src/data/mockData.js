@@ -5,6 +5,65 @@ export const INITIAL_STATS = {
     views: 342,
 };
 
+export const INITIAL_PROFILE = {
+    name: "John Doe",
+    title: "Professional Plumber",
+    bio: "Certified plumber with 10+ years of experience in residential and commercial repairs. I specialize in leak detection, pipe fitting, and emergency repairs.",
+    email: "john.doe@quickserve.com",
+    phone: "+91 98765 43210",
+    location: "Pune, MH",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
+    rating: 4.8,
+    reviews: 124,
+    experience: "10+ Years",
+    completedJobs: 458,
+    responseTime: "< 30 mins",
+    languages: ["English", "Hindi", "Marathi"],
+    skills: ["Leak Detection", "Pipe Fitting", "Emergency Repairs", "Water Heater Installation", "Drain Cleaning", "Bathroom Renovation"],
+    certifications: [
+        { name: "Licensed Master Plumber", issuer: "Maharashtra State Board", year: "2015" },
+        { name: "Gas Safety Certified", issuer: "Indian Gas Safety Council", year: "2020" },
+        { name: "Green Plumbing Specialist", issuer: "Eco Build India", year: "2022" },
+    ],
+    workingHours: {
+        monday: { open: "09:00", close: "18:00", isOpen: true },
+        tuesday: { open: "09:00", close: "18:00", isOpen: true },
+        wednesday: { open: "09:00", close: "18:00", isOpen: true },
+        thursday: { open: "09:00", close: "18:00", isOpen: true },
+        friday: { open: "09:00", close: "18:00", isOpen: true },
+        saturday: { open: "10:00", close: "16:00", isOpen: true },
+        sunday: { open: "00:00", close: "00:00", isOpen: false },
+    },
+    verified: true,
+    memberSince: "2021",
+};
+
+export const INITIAL_SETTINGS = {
+    radius: 15,
+    notifications: {
+        push: true,
+        email: true,
+        sms: false,
+        promo: false,
+    },
+    availability: {
+        acceptingBookings: true,
+        instantBooking: true,
+        emergencyServices: true,
+    },
+    booking: {
+        autoConfirm: false,
+        minLeadTime: 2,
+        maxAdvanceBooking: 14,
+        cancellationWindow: 24,
+    },
+    payment: {
+        acceptCash: true,
+        acceptOnline: true,
+        acceptUPI: true,
+    },
+};
+
 export const INITIAL_BOOKINGS = [
     {
         id: 1,
