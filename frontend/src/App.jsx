@@ -13,10 +13,11 @@ import BookingsView from "./pages/BookingsView";
 import ServicesView from "./pages/ServicesView";
 import ProfileView from "./pages/ProfileView";
 import SettingsView from "./pages/SettingsView";
-import AuthPages from "./pages/AuthPages";
+import ProtectedRoute from "./components/ProtectedRoute";
+import useAuthStore from "./store/useAuthStore";
 
 export default function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const { logout, user } = useAuthStore();
     const [activeTab, setActiveTab] = useState("dashboard");
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -26,13 +27,8 @@ export default function App() {
     const [profile, setProfile] = useState(INITIAL_PROFILE);
     const [settings, setSettings] = useState(INITIAL_SETTINGS);
 
-    const handleLogin = () => {
-        setIsAuthenticated(true);
-        setActiveTab("dashboard");
-    };
-
     const handleLogout = () => {
-        setIsAuthenticated(false);
+        logout();
     };
 
     const handleBookingAction = (id, newStatus) => {
@@ -63,61 +59,60 @@ export default function App() {
         setServices((prev) => prev.filter((s) => s.id !== id));
     };
 
-    // Show Auth page if not authenticated
-    if (!isAuthenticated) {
-        return <AuthPages onLogin={handleLogin} />;
-    }
-
     return (
-        <div className="flex h-screen bg-slate-50 font-sans text-slate-900">
-            <Sidebar
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
-                isMobileMenuOpen={isMobileMenuOpen}
-                setIsMobileMenuOpen={setIsMobileMenuOpen}
-                bookings={bookings}
-                onLogout={handleLogout}
-            />
-
-            <div className="flex-1 flex flex-col min-w-0">
-                <Header
+        <ProtectedRoute>
+            <div className="flex h-screen bg-slate-50 font-sans text-slate-900">
+                <Sidebar
                     activeTab={activeTab}
+                    setActiveTab={setActiveTab}
+                    isMobileMenuOpen={isMobileMenuOpen}
                     setIsMobileMenuOpen={setIsMobileMenuOpen}
+                    bookings={bookings}
+                    onLogout={handleLogout}
+                    user={user}
                 />
 
-                <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
-                    {activeTab === "dashboard" && (
-                        <DashboardView
-                            stats={stats}
-                            bookings={bookings}
-                            handleBookingAction={handleBookingAction}
-                            setActiveTab={setActiveTab}
-                        />
-                    )}
-                    {activeTab === "bookings" && (
-                        <BookingsView
-                            bookings={bookings}
-                            handleBookingAction={handleBookingAction}
-                        />
-                    )}
-                    {activeTab === "services" && (
-                        <ServicesView
-                            services={services}
-                            toggleServiceStatus={toggleServiceStatus}
-                            deleteService={deleteService}
-                        />
-                    )}
-                    {activeTab === "profile" && <ProfileView profile={profile} setProfile={setProfile} />}
-                    {activeTab === "settings" && <SettingsView settings={settings} setSettings={setSettings} />}
-                </main>
+                <div className="flex-1 flex flex-col min-w-0">
+                    <Header
+                        activeTab={activeTab}
+                        setIsMobileMenuOpen={setIsMobileMenuOpen}
+                        user={user}
+                    />
+
+                    <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
+                        {activeTab === "dashboard" && (
+                            <DashboardView
+                                stats={stats}
+                                bookings={bookings}
+                                handleBookingAction={handleBookingAction}
+                                setActiveTab={setActiveTab}
+                            />
+                        )}
+                        {activeTab === "bookings" && (
+                            <BookingsView
+                                bookings={bookings}
+                                handleBookingAction={handleBookingAction}
+                            />
+                        )}
+                        {activeTab === "services" && (
+                            <ServicesView
+                                services={services}
+                                toggleServiceStatus={toggleServiceStatus}
+                                deleteService={deleteService}
+                            />
+                        )}
+                        {activeTab === "profile" && <ProfileView profile={profile} setProfile={setProfile} />}
+                        {activeTab === "settings" && <SettingsView settings={settings} setSettings={setSettings} />}
+                    </main>
+                </div>
+
+                {isMobileMenuOpen && (
+                    <div
+                        className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                    />
+                )}
             </div>
-
-            {isMobileMenuOpen && (
-                <div
-                    className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                />
-            )}
-        </div>
+        </ProtectedRoute>
     );
 }

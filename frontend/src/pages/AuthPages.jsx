@@ -3,9 +3,26 @@ import AuthHeader from '../components/auth/AuthHeader';
 import AuthFooter from '../components/auth/AuthFooter';
 import LoginForm from '../components/auth/LoginForm';
 import SignupForm from '../components/auth/SignupForm';
+import useAuthStore from '../store/useAuthStore';
 
-const AuthPages = ({ onLogin }) => {
+const AuthPages = () => {
     const [view, setView] = useState('login'); // 'login' | 'signup'
+    const { login, signup, isLoading, error, clearError } = useAuthStore();
+
+    const handleLogin = async (email, password) => {
+        clearError();
+        await login(email, password);
+    };
+
+    const handleSignup = async (formData) => {
+        clearError();
+        await signup(formData);
+    };
+
+    const switchView = (newView) => {
+        clearError();
+        setView(newView);
+    };
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
@@ -18,9 +35,19 @@ const AuthPages = ({ onLogin }) => {
                     
                     {/* View Container */}
                     {view === 'login' ? (
-                        <LoginForm onSwitchToSignup={() => setView('signup')} onLogin={onLogin} />
+                        <LoginForm 
+                            onSwitchToSignup={() => switchView('signup')} 
+                            onLogin={handleLogin}
+                            isLoading={isLoading}
+                            error={error}
+                        />
                     ) : (
-                        <SignupForm onSwitchToLogin={() => setView('login')} onSignup={onLogin} />
+                        <SignupForm 
+                            onSwitchToLogin={() => switchView('login')} 
+                            onSignup={handleSignup}
+                            isLoading={isLoading}
+                            error={error}
+                        />
                     )}
                     
                 </div>
