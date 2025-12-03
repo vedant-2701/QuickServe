@@ -1,13 +1,22 @@
-import React, { useState } from 'react';
-import AuthHeader from '../components/auth/AuthHeader';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, Users, Briefcase, Zap } from 'lucide-react';
 import AuthFooter from '../components/auth/AuthFooter';
 import LoginForm from '../components/auth/LoginForm';
 import SignupForm from '../components/auth/SignupForm';
 import useAuthStore from '../store/useAuthStore';
 
-const AuthPages = () => {
-    const [view, setView] = useState('login'); // 'login' | 'signup'
+const AuthPages = ({ selectedRole = 'provider', onBack }) => {
+    const [view, setView] = useState(selectedRole === 'customer' ? 'login' : 'signup');
     const { login, signup, isLoading, error, clearError } = useAuthStore();
+
+    useEffect(() => {
+        // Set initial view based on role
+        if (selectedRole === 'customer') {
+            setView('login');
+        } else {
+            setView('signup');
+        }
+    }, [selectedRole]);
 
     const handleLogin = async (email, password) => {
         clearError();
@@ -25,12 +34,51 @@ const AuthPages = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/30 flex flex-col py-8 sm:py-12 sm:px-6 lg:px-8 font-sans">
             
-            {/* Brand Header */}
-            <AuthHeader />
+            {/* Back Button & Header */}
+            <div className="sm:mx-auto sm:w-full sm:max-w-[40rem] mb-6 px-4">
+                <button
+                    onClick={onBack}
+                    className="group flex items-center gap-2 text-slate-600 hover:text-indigo-600 font-medium transition-colors mb-6"
+                >
+                    <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                    Back to Home
+                </button>
 
-            <div className="sm:mx-auto sm:w-full sm:max-w-[40rem]">
+                {/* Logo */}
+                <div className="flex items-center justify-center gap-2 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                        <Zap className="w-7 h-7 text-white" />
+                    </div>
+                    <span className="text-3xl font-bold text-slate-900">
+                        Quick<span className="text-indigo-600">Serve</span>
+                    </span>
+                </div>
+
+                {/* Role Indicator */}
+                <div className="flex justify-center">
+                    <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${
+                        selectedRole === 'customer'
+                            ? 'bg-blue-100 text-blue-700'
+                            : 'bg-purple-100 text-purple-700'
+                    }`}>
+                        {selectedRole === 'customer' ? (
+                            <>
+                                <Users className="w-4 h-4" />
+                                Customer Portal
+                            </>
+                        ) : (
+                            <>
+                                <Briefcase className="w-4 h-4" />
+                                Service Provider Portal
+                            </>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            <div className="sm:mx-auto sm:w-full sm:max-w-[40rem] flex-1 flex flex-col">
                 <div className="bg-white py-8 px-4 shadow-xl shadow-slate-200/50 sm:rounded-2xl sm:px-10 border border-slate-100">
                     
                     {/* View Container */}
@@ -40,6 +88,7 @@ const AuthPages = () => {
                             onLogin={handleLogin}
                             isLoading={isLoading}
                             error={error}
+                            isCustomer={selectedRole === 'customer'}
                         />
                     ) : (
                         <SignupForm 

@@ -2,7 +2,7 @@ import React from "react";
 import {
     MapPin,
     Calendar,
-    DollarSign,
+    IndianRupee,
     Star,
     User,
     Plus,
@@ -17,10 +17,13 @@ const DashboardView = ({
     bookings,
     handleBookingAction,
     setActiveTab,
+    profile,
 }) => {
     const todayBookings = bookings.filter(
         (b) => b.status === "confirmed" || b.status === "pending"
     );
+
+    const userName = profile?.name?.split(' ')[0] || 'there';
 
     return (
         <div className="space-y-6">
@@ -30,13 +33,13 @@ const DashboardView = ({
                         Overview
                     </h2>
                     <p className="text-slate-500">
-                        Welcome back, John! Here's what's happening today.
+                        Welcome back, {userName}! Here's what's happening today.
                     </p>
                 </div>
                 <div className="hidden sm:block text-right">
                     <p className="text-sm text-slate-500">Current Location</p>
                     <p className="font-medium text-slate-800 flex items-center justify-end gap-1">
-                        <MapPin className="w-4 h-4 text-indigo-600" /> XYZ, IN
+                        <MapPin className="w-4 h-4 text-indigo-600" /> {profile?.location || 'Location not set'}
                     </p>
                 </div>
             </div>
@@ -44,27 +47,27 @@ const DashboardView = ({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard
                     title="Total Earnings"
-                    value={`$${stats.earnings}`}
-                    icon={DollarSign}
-                    trend="+12% from last week"
+                    value={`₹${stats.earnings}`}
+                    icon={IndianRupee}
+                    trend={stats.earningsTrend || "+0% from last week"}
                 />
                 <StatCard
                     title="Total Bookings"
                     value={stats.bookings}
                     icon={Calendar}
-                    trend="+4 new today"
+                    trend={stats.bookingsTrend || "+0 new today"}
                 />
                 <StatCard
                     title="Average Rating"
                     value={stats.rating}
                     icon={Star}
-                    trend="Top Rated Provider"
+                    trend={stats.ratingStatus || "Good Rating"}
                 />
                 <StatCard
                     title="Profile Views"
                     value={stats.views}
                     icon={User}
-                    trend="+24% this month"
+                    trend={stats.viewsTrend || "+0% this month"}
                 />
             </div>
 

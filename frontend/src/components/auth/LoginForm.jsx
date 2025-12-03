@@ -3,7 +3,7 @@ import { Mail, ArrowRight, Loader2 } from 'lucide-react';
 import InputField from './InputField';
 import PasswordField from './PasswordField';
 
-const LoginForm = ({ onSwitchToSignup, onLogin, isLoading = false, error = null }) => {
+const LoginForm = ({ onSwitchToSignup, onLogin, isLoading = false, error = null, isCustomer = false }) => {
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -25,8 +25,14 @@ const LoginForm = ({ onSwitchToSignup, onLogin, isLoading = false, error = null 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-slate-900">Welcome Back</h2>
-                <p className="text-slate-500 mt-2">Log in to manage your bookings and services.</p>
+                <h2 className="text-2xl font-bold text-slate-900">
+                    {isCustomer ? 'Customer Sign In' : 'Welcome Back'}
+                </h2>
+                <p className="text-slate-500 mt-2">
+                    {isCustomer 
+                        ? 'Log in to discover and book local services.'
+                        : 'Log in to manage your bookings and services.'}
+                </p>
             </div>
 
             {error && (
@@ -85,13 +91,27 @@ const LoginForm = ({ onSwitchToSignup, onLogin, isLoading = false, error = null 
 
             <div className="mt-8 text-center border-t border-slate-100 pt-6">
                 <p className="text-slate-600">
-                    Want to become a provider?{' '}
-                    <button 
-                        onClick={onSwitchToSignup} 
-                        className="font-bold text-indigo-600 hover:text-indigo-500"
-                    >
-                        Join QuickServe
-                    </button>
+                    {isCustomer ? (
+                        <>
+                            New to QuickServe?{' '}
+                            <button 
+                                onClick={onSwitchToSignup} 
+                                className="font-bold text-indigo-600 hover:text-indigo-500"
+                            >
+                                Create Account
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            Want to become a provider?{' '}
+                            <button 
+                                onClick={onSwitchToSignup} 
+                                className="font-bold text-indigo-600 hover:text-indigo-500"
+                            >
+                                Join QuickServe
+                            </button>
+                        </>
+                    )}
                 </p>
             </div>
         </div>

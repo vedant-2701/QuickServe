@@ -76,6 +76,12 @@ public class ServiceProvider {
     @Column(name = "language")
     private List<String> languages = new ArrayList<>();
 
+    // Skills
+    @ElementCollection
+    @CollectionTable(name = "provider_skills", joinColumns = @JoinColumn(name = "provider_id"))
+    @Column(name = "skill")
+    private List<String> skills = new ArrayList<>();
+
     // Ratings and Stats
     @Column(precision = 3, scale = 2)
     private BigDecimal averageRating = BigDecimal.ZERO;
@@ -83,6 +89,8 @@ public class ServiceProvider {
     private Integer totalReviews = 0;
 
     private Integer completedJobs = 0;
+
+    private Integer profileViews = 0;
 
     private boolean isAvailable = true;
 
@@ -92,4 +100,17 @@ public class ServiceProvider {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    // One-to-Many relationships
+    @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProviderService> services = new ArrayList<>();
+
+    @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WorkingHours> workingHours = new ArrayList<>();
+
+    @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Booking> bookings = new ArrayList<>();
+
+    @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Certification> certifications = new ArrayList<>();
 }

@@ -83,7 +83,7 @@ const BookingsView = ({ bookings, handleBookingAction }) => {
                                         <td className="p-4 text-slate-700">
                                             {booking.service}
                                             <div className="text-xs text-indigo-600 font-medium mt-1">
-                                                ${booking.price}
+                                                ₹{booking.price}
                                             </div>
                                         </td>
                                         <td className="p-4 text-slate-700">

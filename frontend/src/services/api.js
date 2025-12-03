@@ -89,11 +89,25 @@ export const authApi = {
 
 // Provider API
 export const providerApi = {
+    // Dashboard
+    getStats: () => api.get('/provider/stats'),
+    
+    // Profile
     getProfile: () => api.get('/provider/profile'),
     updateProfile: (data) => api.put('/provider/profile', data),
-    getStats: () => api.get('/provider/stats'),
-    getBookings: () => api.get('/provider/bookings'),
     updateAvailability: (available) => api.patch('/provider/availability', { available }),
+    
+    // Services
+    getServices: () => api.get('/provider/services'),
+    createService: (data) => api.post('/provider/services', data),
+    updateService: (serviceId, data) => api.put(`/provider/services/${serviceId}`, data),
+    deleteService: (serviceId) => api.delete(`/provider/services/${serviceId}`),
+    toggleServiceStatus: (serviceId) => api.patch(`/provider/services/${serviceId}/toggle`),
+    
+    // Bookings
+    getBookings: () => api.get('/provider/bookings'),
+    getUpcomingBookings: () => api.get('/provider/bookings/upcoming'),
+    updateBookingStatus: (bookingId, data) => api.patch(`/provider/bookings/${bookingId}/status`, data),
 };
 
 // Services API

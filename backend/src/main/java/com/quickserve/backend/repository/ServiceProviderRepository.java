@@ -1,6 +1,7 @@
 package com.quickserve.backend.repository;
 
 import com.quickserve.backend.model.ServiceProvider;
+import com.quickserve.backend.model.User;
 import com.quickserve.backend.model.enums.ServiceCategory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,6 +15,8 @@ import java.util.Optional;
 public interface ServiceProviderRepository extends JpaRepository<ServiceProvider, Long> {
     
     Optional<ServiceProvider> findByUserId(Long userId);
+    
+    Optional<ServiceProvider> findByUser(User user);
     
     List<ServiceProvider> findByPrimaryService(ServiceCategory category);
     

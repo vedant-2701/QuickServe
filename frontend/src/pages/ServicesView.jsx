@@ -1,39 +1,84 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     Briefcase,
-    DollarSign,
+    IndianRupee,
     Clock,
     Edit2,
     Trash2,
     Plus,
 } from "lucide-react";
+import AddServiceModal from "../components/AddServiceModal";
+import EditServiceModal from "../components/EditServiceModal";
+import useDashboardStore from "../store/useDashboardStore";
 
-const ServicesView = ({ services, toggleServiceStatus, deleteService }) => (
-    <div className="space-y-6">
-        <div className="flex justify-between items-center">
-            <div>
-                <h2 className="text-2xl font-bold text-slate-800">
-                    My Services
-                </h2>
-                <p className="text-slate-500">
-                    Manage what you offer and your pricing.
-                </p>
-            </div>
-            <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition flex items-center gap-2 shadow-sm">
-                <Plus className="w-4 h-4" /> Add Service
-            </button>
-        </div>
+const ServicesView = ({ services, toggleServiceStatus, deleteService }) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedService, setSelectedService] = useState(null);
+    const { createService, updateService, isLoading } = useDashboardStore();
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((service) => (
-                <div
-                    key={service.id}
-                    className={`bg-white rounded-xl shadow-sm border transition-all ${
-                        service.active
-                            ? "border-slate-200"
-                            : "border-slate-100 opacity-75"
-                    }`}
+    const handleAddService = async (serviceData) => {
+        const result = await createService(serviceData);
+        return result.success;
+    };
+
+    const handleEditService = async (serviceId, serviceData) => {
+        const result = await updateService(serviceId, serviceData);
+        return result.success;
+    };
+
+    const openEditModal = (service) => {
+        setSelectedService(service);
+        setIsEditModalOpen(true);
+    };
+
+    const closeEditModal = () => {
+        setSelectedService(null);
+        setIsEditModalOpen(false);
+    };
+
+    return (
+        <div className="space-y-6">
+            <div className="flex justify-between items-center">
+                <div>
+                    <h2 className="text-2xl font-bold text-slate-800">
+                        My Services
+                    </h2>
+                    <p className="text-slate-500">
+                        Manage what you offer and your pricing.
+                    </p>
+                </div>
+                <button 
+                    onClick={() => setIsModalOpen(true)}
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition flex items-center gap-2 shadow-sm"
                 >
+                    <Plus className="w-4 h-4" /> Add Service
+                </button>
+            </div>
+
+            {services.length === 0 ? (
+                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-12 text-center">
+                    <Briefcase className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-slate-800 mb-2">No services yet</h3>
+                    <p className="text-slate-500 mb-6">Start by adding your first service to attract customers.</p>
+                    <button 
+                        onClick={() => setIsModalOpen(true)}
+                        className="bg-indigo-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-indigo-700 transition inline-flex items-center gap-2"
+                    >
+                        <Plus className="w-4 h-4" /> Add Your First Service
+                    </button>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {services.map((service) => (
+                        <div
+                            key={service.id}
+                            className={`bg-white rounded-xl shadow-sm border transition-all ${
+                                service.active
+                                    ? "border-slate-200"
+                                    : "border-slate-100 opacity-75"
+                            }`}
+                        >
                     <div className="p-5">
                         <div className="flex justify-between items-start mb-4">
                             <div
@@ -82,7 +127,7 @@ const ServicesView = ({ services, toggleServiceStatus, deleteService }) => (
 
                         <div className="flex items-center gap-4 text-sm text-slate-600 mb-6">
                             <div className="flex items-center gap-1">
-                                <DollarSign className="w-4 h-4 text-slate-400" />
+                                <IndianRupee className="w-4 h-4 text-slate-400" />
                                 {service.price}
                             </div>
                             <div className="flex items-center gap-1">
@@ -92,7 +137,10 @@ const ServicesView = ({ services, toggleServiceStatus, deleteService }) => (
                         </div>
 
                         <div className="flex gap-2">
-                            <button className="flex-1 py-2 px-4 rounded-lg border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition flex items-center justify-center gap-2">
+                            <button 
+                                onClick={() => openEditModal(service)}
+                                className="flex-1 py-2 px-4 rounded-lg border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition flex items-center justify-center gap-2"
+                            >
                                 <Edit2 className="w-4 h-4" /> Edit
                             </button>
                             <button
@@ -109,9 +157,26 @@ const ServicesView = ({ services, toggleServiceStatus, deleteService }) => (
                         </div>
                     )}
                 </div>
-            ))}
+                    ))}
+                </div>
+            )}
+
+            <AddServiceModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSubmit={handleAddService}
+                isLoading={isLoading}
+            />
+
+            <EditServiceModal
+                isOpen={isEditModalOpen}
+                onClose={closeEditModal}
+                onSubmit={handleEditService}
+                service={selectedService}
+                isLoading={isLoading}
+            />
         </div>
-    </div>
-);
+    );
+};
 
 export default ServicesView;
