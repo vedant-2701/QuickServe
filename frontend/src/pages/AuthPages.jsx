@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Users, Briefcase, Zap } from 'lucide-react';
 import AuthFooter from '../components/auth/AuthFooter';
 import LoginForm from '../components/auth/LoginForm';
 import SignupForm from '../components/auth/SignupForm';
+import CustomerSignupForm from '../components/auth/CustomerSignupForm';
 import useAuthStore from '../store/useAuthStore';
 
 const AuthPages = ({ selectedRole = 'provider', onBack }) => {
+    const navigate = useNavigate();
     const [view, setView] = useState(selectedRole === 'customer' ? 'login' : 'signup');
-    const { login, signup, isLoading, error, clearError } = useAuthStore();
+    const { login, signup, signupCustomer, isLoading, error, clearError, isAuthenticated, user } = useAuthStore();
 
     useEffect(() => {
         // Set initial view based on role
@@ -18,14 +21,33 @@ const AuthPages = ({ selectedRole = 'provider', onBack }) => {
         }
     }, [selectedRole]);
 
+    // Redirect after successful authentication
+    useEffect(() => {
+        if (isAuthenticated && user) {
+            if (user.role === 'CUSTOMER') {
+                navigate('/customer', { replace: true });
+            } else if (user.role === 'SERVICE_PROVIDER') {
+                navigate('/provider', { replace: true });
+            }
+        }
+    }, [isAuthenticated, user, navigate]);
+
     const handleLogin = async (email, password) => {
         clearError();
-        await login(email, password);
+        const result = await login(email, password);
+        // Navigation will happen automatically via useEffect when isAuthenticated changes
     };
 
     const handleSignup = async (formData) => {
         clearError();
-        await signup(formData);
+        const result = await signup(formData);
+        // Navigation will happen automatically via useEffect when isAuthenticated changes
+    };
+
+    const handleCustomerSignup = async (formData) => {
+        clearError();
+        const result = await signupCustomer(formData);
+        // Navigation will happen automatically via useEffect when isAuthenticated changes
     };
 
     const switchView = (newView) => {
@@ -89,6 +111,13 @@ const AuthPages = ({ selectedRole = 'provider', onBack }) => {
                             isLoading={isLoading}
                             error={error}
                             isCustomer={selectedRole === 'customer'}
+                        />
+                    ) : selectedRole === 'customer' ? (
+                        <CustomerSignupForm 
+                            onSwitchToLogin={() => switchView('login')} 
+                            onSignup={handleCustomerSignup}
+                            isLoading={isLoading}
+                            error={error}
                         />
                     ) : (
                         <SignupForm 

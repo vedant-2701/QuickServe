@@ -2,6 +2,7 @@ package com.quickserve.backend.controller;
 
 import com.quickserve.backend.dto.request.LoginRequest;
 import com.quickserve.backend.dto.request.SignupRequest;
+import com.quickserve.backend.dto.request.customer.CustomerSignupRequest;
 import com.quickserve.backend.dto.response.ApiResponse;
 import com.quickserve.backend.dto.response.AuthResponse;
 import com.quickserve.backend.service.AuthService;
@@ -31,6 +32,13 @@ public class AuthController {
         AuthResponse response = authService.signup(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Account created successfully", response));
+    }
+
+    @PostMapping("/signup/customer")
+    public ResponseEntity<ApiResponse<AuthResponse>> signupCustomer(@Valid @RequestBody CustomerSignupRequest request) {
+        AuthResponse response = authService.signupCustomer(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Customer account created successfully", response));
     }
 
     @PostMapping("/refresh")

@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { 
     User, MapPin, Star, Mail, Phone, Camera, Save, X, Plus,
     Clock, Briefcase, Award, Languages, CheckCircle, Calendar,
     Zap, Shield, Trash2
 } from "lucide-react";
 
-const ProfileSection = ({ profile: initialProfile, setProfile: updateProfile }) => {
+const ProfileView = ({ profile: initialProfile, setProfile: updateProfile }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [profile, setProfile] = useState(initialProfile);
     const [newSkill, setNewSkill] = useState("");
     const [newLanguage, setNewLanguage] = useState("");
 
     // Update local state when initialProfile changes
-    useEffect(() => {
+    React.useEffect(() => {
         if (initialProfile) {
             setProfile(initialProfile);
         }
@@ -132,7 +132,7 @@ const ProfileSection = ({ profile: initialProfile, setProfile: updateProfile }) 
                     <div className="flex justify-between items-end -mt-12 mb-6">
                         <div className="relative">
                             <img
-                                src={profile.avatar}
+                                src="https://api.dicebear.com/7.x/avataaars/svg?seed=Cat"
                                 alt="Profile"
                                 className="w-24 h-24 rounded-xl border-4 border-white bg-white shadow-sm"
                             />
@@ -456,7 +456,7 @@ const ProfileSection = ({ profile: initialProfile, setProfile: updateProfile }) 
                     <div className="space-y-3">
                         {profile.certifications?.map((cert, index) => (
                             <div key={index} className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
-                                <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 flex-shrink-0">
+                                <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
                                     <CheckCircle className="w-4 h-4" />
                                 </div>
                                 {isEditing ? (
@@ -569,7 +569,6 @@ const ProfileSection = ({ profile: initialProfile, setProfile: updateProfile }) 
                             key={index}
                             className="aspect-video bg-slate-100 rounded-lg overflow-hidden relative group"
                         >
-                            {/* Using a placeholder div for demo purposes */}
                             <div className="w-full h-full flex items-center justify-center text-slate-400 bg-slate-50">
                                 Work Sample {index + 1}
                             </div>
@@ -586,4 +585,4 @@ const ProfileSection = ({ profile: initialProfile, setProfile: updateProfile }) 
     );
 };
 
-export default ProfileSection;
+export default ProfileView;

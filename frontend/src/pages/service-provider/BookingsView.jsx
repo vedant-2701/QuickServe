@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { MapPin, Calendar, Clock, XCircle, CheckCircle } from "lucide-react";
-import StatusBadge from "../components/StatusBadge";
+import StatusBadge from "../../components/StatusBadge";
 
 const BookingsView = ({ bookings, handleBookingAction }) => {
     const [filter, setFilter] = useState("all");

@@ -82,6 +82,7 @@ api.interceptors.response.use(
 export const authApi = {
     login: (credentials) => api.post('/auth/login', credentials),
     signup: (data) => api.post('/auth/signup', data),
+    signupCustomer: (data) => api.post('/auth/signup/customer', data),
     logout: (email) => api.post('/auth/logout', { email }),
     refreshToken: (refreshToken) => api.post('/auth/refresh', { refreshToken }),
     verifyToken: () => api.get('/auth/me'),
@@ -110,9 +111,47 @@ export const providerApi = {
     updateBookingStatus: (bookingId, data) => api.patch(`/provider/bookings/${bookingId}/status`, data),
 };
 
-// Services API
+// Customer API
+export const customerApi = {
+    // Profile
+    getProfile: () => api.get('/customer/profile'),
+    updateProfile: (data) => api.put('/customer/profile', data),
+    
+    // Bookings
+    createBooking: (data) => api.post('/customer/bookings', data),
+    getBookings: () => api.get('/customer/bookings'),
+    getUpcomingBookings: () => api.get('/customer/bookings/upcoming'),
+    getPastBookings: () => api.get('/customer/bookings/past'),
+    getBookingById: (bookingId) => api.get(`/customer/bookings/${bookingId}`),
+    cancelBooking: (bookingId, reason) => api.post(`/customer/bookings/${bookingId}/cancel`, { reason }),
+    
+    // Reviews
+    createReview: (data) => api.post('/customer/reviews', data),
+    getMyReviews: () => api.get('/customer/reviews'),
+    
+    // Saved Addresses
+    getSavedAddresses: () => api.get('/customer/addresses'),
+    addSavedAddress: (data) => api.post('/customer/addresses', data),
+    updateSavedAddress: (addressId, data) => api.put(`/customer/addresses/${addressId}`, data),
+    deleteSavedAddress: (addressId) => api.delete(`/customer/addresses/${addressId}`),
+    setDefaultAddress: (addressId) => api.patch(`/customer/addresses/${addressId}/default`),
+};
+
+// Public API (no auth required)
+export const publicApi = {
+    // Categories
+    getCategories: () => api.get('/public/categories'),
+    
+    // Providers
+    searchProviders: (params) => api.get('/public/providers', { params }),
+    getProviderDetails: (providerId) => api.get(`/public/providers/${providerId}`),
+    getProviderReviews: (providerId, page = 0, size = 10) => 
+        api.get(`/public/providers/${providerId}/reviews`, { params: { page, size } }),
+};
+
+// Services API (legacy - use publicApi instead)
 export const servicesApi = {
-    getCategories: () => api.get('/public/services/categories'),
+    getCategories: () => api.get('/public/categories'),
     searchProviders: (params) => api.get('/public/providers', { params }),
 };
 

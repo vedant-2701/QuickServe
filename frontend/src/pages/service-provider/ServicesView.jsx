@@ -7,9 +7,9 @@ import {
     Trash2,
     Plus,
 } from "lucide-react";
-import AddServiceModal from "../components/AddServiceModal";
-import EditServiceModal from "../components/EditServiceModal";
-import useDashboardStore from "../store/useDashboardStore";
+import AddServiceModal from "../../components/service-provider/AddServiceModal";
+import EditServiceModal from "../../components/service-provider/EditServiceModal";
+import useDashboardStore from "../../store/useDashboardStore";
 
 const ServicesView = ({ services, toggleServiceStatus, deleteService }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);

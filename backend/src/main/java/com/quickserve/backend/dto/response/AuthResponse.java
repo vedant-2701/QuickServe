@@ -30,5 +30,6 @@ public class AuthResponse {
         private Role role;
         private String profilePhotoUrl;
         private Long providerId; // null if not a service provider
+        private Long customerId; // null if not a customer
     }
 }

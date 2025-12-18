@@ -12,7 +12,7 @@ export const INITIAL_PROFILE = {
     email: "john.doe@quickserve.com",
     phone: "+91 98765 43210",
     location: "Pune, MH",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Cat",
     rating: 4.8,
     reviews: 124,
     experience: "10+ Years",

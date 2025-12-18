@@ -9,7 +9,7 @@ import {
     X,
 } from "lucide-react";
 
-const Sidebar = ({
+const ProviderSidebar = ({
     activeTab,
     setActiveTab,
     isMobileMenuOpen,
@@ -118,4 +118,4 @@ const Sidebar = ({
     );
 };
 
-export default Sidebar;
+export default ProviderSidebar;

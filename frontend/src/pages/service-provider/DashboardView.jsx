@@ -9,8 +9,8 @@ import {
     Clock,
     ChevronRight,
 } from "lucide-react";
-import StatCard from "../components/StatCard";
-import StatusBadge from "../components/StatusBadge";
+import StatCard from "../../components/StatCard";
+import StatusBadge from "../../components/StatusBadge";
 
 const DashboardView = ({
     stats,

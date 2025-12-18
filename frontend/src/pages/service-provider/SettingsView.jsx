@@ -4,7 +4,6 @@ import {
     Lock,
     Globe,
     Shield,
-    Moon,
     Smartphone,
     ChevronRight,
     Calendar,
@@ -15,7 +14,7 @@ import {
     Wallet,
 } from "lucide-react";
 
-const SettingsSection = ({ settings: initialSettings, setSettings: updateSettings }) => {
+const SettingsView = ({ settings: initialSettings, setSettings: updateSettings }) => {
     const [radius, setRadius] = useState(initialSettings.radius);
     const [notifications, setNotifications] = useState(initialSettings.notifications);
     const [availability, setAvailability] = useState(initialSettings.availability || { acceptingBookings: true, instantBooking: true, emergencyServices: true });
@@ -418,4 +417,4 @@ const SettingsSection = ({ settings: initialSettings, setSettings: updateSetting
     );
 };
 
-export default SettingsSection;
+export default SettingsView;

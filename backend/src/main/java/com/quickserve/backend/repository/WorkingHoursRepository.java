@@ -14,6 +14,8 @@ public interface WorkingHoursRepository extends JpaRepository<WorkingHours, Long
     
     List<WorkingHours> findByProviderOrderByDayOfWeek(ServiceProvider provider);
     
+    List<WorkingHours> findByProvider(ServiceProvider provider);
+    
     Optional<WorkingHours> findByProviderAndDayOfWeek(ServiceProvider provider, DayOfWeek dayOfWeek);
     
     void deleteByProvider(ServiceProvider provider);

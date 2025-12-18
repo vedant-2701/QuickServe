@@ -22,8 +22,16 @@ public interface ServiceProviderRepository extends JpaRepository<ServiceProvider
     
     List<ServiceProvider> findByCity(String city);
     
+    List<ServiceProvider> findByIsAvailableTrue();
+    
+    long countByPrimaryService(ServiceCategory category);
+    
     @Query("SELECT sp FROM ServiceProvider sp WHERE sp.city = :city AND sp.primaryService = :category AND sp.isAvailable = true")
     List<ServiceProvider> findAvailableProvidersByCityAndCategory(@Param("city") String city, @Param("category") ServiceCategory category);
+    
+    @Query("SELECT sp FROM ServiceProvider sp WHERE sp.isAvailable = true AND " +
+           "(sp.primaryService = :category OR :category MEMBER OF sp.secondaryServices)")
+    List<ServiceProvider> findAvailableByCategory(@Param("category") ServiceCategory category);
     
     boolean existsByAadharNumber(String aadharNumber);
 }

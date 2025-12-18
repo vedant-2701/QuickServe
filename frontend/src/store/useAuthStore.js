@@ -60,6 +60,29 @@ const useAuthStore = create(
                 }
             },
 
+            signupCustomer: async (formData) => {
+                set({ isLoading: true, error: null });
+                try {
+                    const response = await authApi.signupCustomer(formData);
+                    const { accessToken, refreshToken, user } = response.data.data;
+                    
+                    set({
+                        user,
+                        accessToken,
+                        refreshToken,
+                        isAuthenticated: true,
+                        isLoading: false,
+                        error: null,
+                    });
+                    
+                    return { success: true };
+                } catch (error) {
+                    const message = error.response?.data?.message || 'Signup failed. Please try again.';
+                    set({ isLoading: false, error: message });
+                    return { success: false, error: message };
+                }
+            },
+
             logout: () => {
                 const { user } = get();
                 if (user?.email) {

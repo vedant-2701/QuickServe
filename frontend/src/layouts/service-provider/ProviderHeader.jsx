@@ -1,7 +1,7 @@
 import React from "react";
 import { Bell, Menu } from "lucide-react";
 
-const Header = ({ activeTab, setIsMobileMenuOpen, user, profile }) => {
+const ProviderHeader = ({ activeTab, setIsMobileMenuOpen, user, profile }) => {
     return (
         <header className="bg-white h-16 border-b border-slate-200 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-40">
             <div className="flex items-center gap-4">
@@ -38,4 +38,4 @@ const Header = ({ activeTab, setIsMobileMenuOpen, user, profile }) => {
     );
 };
 
-export default Header;
+export default ProviderHeader;
