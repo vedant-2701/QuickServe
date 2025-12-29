@@ -86,8 +86,8 @@ public class ProviderDashboardServiceImpl implements ProviderDashboardService {
         long activeServices = serviceRepository.countByProviderAndActiveTrue(provider);
         
         // Rating status - handle null averageRating
-        BigDecimal avgRating = provider.getAverageRating() != null ? provider.getAverageRating() : BigDecimal.ZERO;
-        int totalReviews = provider.getTotalReviews() != null ? provider.getTotalReviews() : 0;
+        BigDecimal avgRating = provider.getAverageRatingSafe();
+        int totalReviews = provider.getTotalReviewsSafe();
         String ratingStatus = avgRating.compareTo(new BigDecimal("4.5")) >= 0 
                 ? "Top Rated Provider" : "Good Rating";
         
@@ -100,7 +100,7 @@ public class ProviderDashboardServiceImpl implements ProviderDashboardService {
                 .todayBookings(todayBookings)
                 .averageRating(avgRating)
                 .totalReviews(totalReviews)
-                .profileViews(provider.getProfileViews())
+                .profileViews(provider.getProfileViewsSafe())
                 .activeServices((int) activeServices)
                 .earningsTrend(earningsTrend)
                 .bookingsTrend(bookingsTrend)
@@ -176,10 +176,10 @@ public class ProviderDashboardServiceImpl implements ProviderDashboardService {
                 .city(provider.getCity())
                 .state(provider.getState())
                 .pincode(provider.getPincode())
-                .rating(provider.getAverageRating())
-                .reviews(provider.getTotalReviews())
-                .experience(provider.getExperienceYears() + "+ Years")
-                .completedJobs(provider.getCompletedJobs())
+                .rating(provider.getAverageRatingSafe())
+                .reviews(provider.getTotalReviewsSafe())
+                .experience(provider.getExperienceYearsSafe() + "+ Years")
+                .completedJobs(provider.getCompletedJobsSafe())
                 .responseTime("< 30 mins")
                 .verified(provider.isAadharVerified())
                 .memberSince(String.valueOf(provider.getCreatedAt().getYear()))
@@ -187,8 +187,8 @@ public class ProviderDashboardServiceImpl implements ProviderDashboardService {
                 .secondaryServices(provider.getSecondaryServices().stream()
                         .map(ServiceCategory::name)
                         .collect(Collectors.toList()))
-                .serviceRadiusKm(provider.getServiceRadiusKm())
-                .hourlyRate(provider.getHourlyRate())
+                .serviceRadiusKm(provider.getServiceRadiusKmSafe())
+                .hourlyRate(provider.getHourlyRateSafe())
                 .languages(provider.getLanguages())
                 .skills(provider.getSkills())
                 .certifications(certifications)
@@ -463,7 +463,7 @@ public class ProviderDashboardServiceImpl implements ProviderDashboardService {
             case COMPLETED:
                 booking.setCompletedAt(LocalDateTime.now());
                 // Update provider stats
-                provider.setCompletedJobs(provider.getCompletedJobs() + 1);
+                provider.setCompletedJobs(provider.getCompletedJobsSafe() + 1);
                 providerRepository.save(provider);
                 break;
             case CANCELLED:

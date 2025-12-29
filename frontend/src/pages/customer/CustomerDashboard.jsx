@@ -39,6 +39,8 @@ const CustomerDashboard = ({ user, onLogout }) => {
                 return (
                     <ProviderDetails 
                         providerId={pageParams.id}
+                        showReviewModal={pageParams.showReview}
+                        bookingId={pageParams.bookingId}
                         onBack={() => handleNavigate('browse')}
                         onNavigate={handleNavigate}
                     />

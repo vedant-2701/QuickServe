@@ -16,6 +16,12 @@ import {
 } from 'lucide-react';
 import useCustomerStore from '../../store/useCustomerStore';
 
+// Generic placeholder avatar using UI Avatars
+const getPlaceholderAvatar = (name) => {
+    const encodedName = encodeURIComponent(name || 'Provider');
+    return `https://ui-avatars.com/api/?name=${encodedName}&background=6366f1&color=fff&size=100`;
+};
+
 const BrowseServices = ({ onNavigate, initialFilters = {} }) => {
     const { 
         providers, 
@@ -283,7 +289,7 @@ const BrowseServices = ({ onNavigate, initialFilters = {} }) => {
                             {/* Provider Image */}
                             <div className={`relative ${viewMode === 'list' ? 'flex-shrink-0' : 'mb-4'}`}>
                                 <img
-                                    src={provider.avatarUrl || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop'}
+                                    src={provider.avatarUrl || getPlaceholderAvatar(provider.name)}
                                     alt={provider.name}
                                     className={`object-cover rounded-xl ${viewMode === 'list' ? 'w-24 h-24' : 'w-full h-40'}`}
                                 />
@@ -312,17 +318,17 @@ const BrowseServices = ({ onNavigate, initialFilters = {} }) => {
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="flex items-center gap-1">
                                         <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                                        <span className="font-semibold text-slate-800">{provider.avgRating?.toFixed(1) || 'New'}</span>
+                                        <span className="font-semibold text-slate-800">{provider.averageRating?.toFixed(1) || 'New'}</span>
                                     </div>
                                     <span className="text-slate-300">|</span>
                                     <span className="text-sm text-slate-500">{provider.totalReviews || 0} reviews</span>
                                     <span className="text-slate-300">|</span>
-                                    <span className="text-sm text-slate-500">{provider.completedBookings || 0} jobs</span>
+                                    <span className="text-sm text-slate-500">{provider.completedJobs || 0} jobs</span>
                                 </div>
 
-                                {provider.serviceNames && provider.serviceNames.length > 0 && (
+                                {provider.services && provider.services.length > 0 && (
                                     <div className="flex flex-wrap gap-2 mb-3">
-                                        {provider.serviceNames.slice(0, 3).map((service, index) => (
+                                        {provider.services.slice(0, 3).map((service, index) => (
                                             <span 
                                                 key={index}
                                                 className="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded-lg"
@@ -330,9 +336,9 @@ const BrowseServices = ({ onNavigate, initialFilters = {} }) => {
                                                 {service}
                                             </span>
                                         ))}
-                                        {provider.serviceNames.length > 3 && (
+                                        {provider.services.length > 3 && (
                                             <span className="px-2 py-1 bg-indigo-50 text-indigo-600 text-xs rounded-lg">
-                                                +{provider.serviceNames.length - 3} more
+                                                +{provider.services.length - 3} more
                                             </span>
                                         )}
                                     </div>
@@ -340,16 +346,16 @@ const BrowseServices = ({ onNavigate, initialFilters = {} }) => {
 
                                 <div className="flex items-center justify-between pt-3 border-t border-slate-100">
                                     <div className="flex items-center gap-4 text-sm text-slate-500">
-                                        {provider.yearsOfExperience > 0 && (
+                                        {provider.experienceYears > 0 && (
                                             <span className="flex items-center gap-1">
                                                 <Clock className="w-4 h-4" />
-                                                {provider.yearsOfExperience}+ yrs exp
+                                                {provider.experienceYears}+ yrs exp
                                             </span>
                                         )}
-                                        {provider.city && (
+                                        {provider.location && (
                                             <span className="flex items-center gap-1">
                                                 <MapPin className="w-4 h-4" />
-                                                {provider.city}
+                                                {provider.location}
                                             </span>
                                         )}
                                     </div>

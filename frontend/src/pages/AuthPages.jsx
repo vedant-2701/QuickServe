@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Users, Briefcase, Zap } from 'lucide-react';
+import { ArrowLeft, Users, Briefcase, Zap, Shield } from 'lucide-react';
 import AuthFooter from '../components/auth/AuthFooter';
 import LoginForm from '../components/auth/LoginForm';
 import SignupForm from '../components/auth/SignupForm';
@@ -9,12 +9,12 @@ import useAuthStore from '../store/useAuthStore';
 
 const AuthPages = ({ selectedRole = 'provider', onBack }) => {
     const navigate = useNavigate();
-    const [view, setView] = useState(selectedRole === 'customer' ? 'login' : 'signup');
+    const [view, setView] = useState(selectedRole === 'customer' || selectedRole === 'admin' ? 'login' : 'signup');
     const { login, signup, signupCustomer, isLoading, error, clearError, isAuthenticated, user } = useAuthStore();
 
     useEffect(() => {
         // Set initial view based on role
-        if (selectedRole === 'customer') {
+        if (selectedRole === 'customer' || selectedRole === 'admin') {
             setView('login');
         } else {
             setView('signup');
@@ -28,6 +28,8 @@ const AuthPages = ({ selectedRole = 'provider', onBack }) => {
                 navigate('/customer', { replace: true });
             } else if (user.role === 'SERVICE_PROVIDER') {
                 navigate('/provider', { replace: true });
+            } else if (user.role === 'ADMIN') {
+                navigate('/admin', { replace: true });
             }
         }
     }, [isAuthenticated, user, navigate]);
@@ -55,6 +57,31 @@ const AuthPages = ({ selectedRole = 'provider', onBack }) => {
         setView(newView);
     };
 
+    const getRoleIndicator = () => {
+        if (selectedRole === 'admin') {
+            return (
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-red-100 text-red-700">
+                    <Shield className="w-4 h-4" />
+                    Admin Portal
+                </div>
+            );
+        } else if (selectedRole === 'customer') {
+            return (
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-blue-100 text-blue-700">
+                    <Users className="w-4 h-4" />
+                    Customer Portal
+                </div>
+            );
+        } else {
+            return (
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-purple-100 text-purple-700">
+                    <Briefcase className="w-4 h-4" />
+                    Service Provider Portal
+                </div>
+            );
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/30 flex flex-col py-8 sm:py-12 sm:px-6 lg:px-8 font-sans">
             
@@ -70,33 +97,25 @@ const AuthPages = ({ selectedRole = 'provider', onBack }) => {
 
                 {/* Logo */}
                 <div className="flex items-center justify-center gap-2 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                        <Zap className="w-7 h-7 text-white" />
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-lg ${
+                        selectedRole === 'admin' 
+                            ? 'bg-gradient-to-br from-red-500 to-orange-500 shadow-red-500/30'
+                            : 'bg-gradient-to-br from-indigo-600 to-purple-600 shadow-indigo-500/30'
+                    }`}>
+                        {selectedRole === 'admin' ? (
+                            <Shield className="w-7 h-7 text-white" />
+                        ) : (
+                            <Zap className="w-7 h-7 text-white" />
+                        )}
                     </div>
                     <span className="text-3xl font-bold text-slate-900">
-                        Quick<span className="text-indigo-600">Serve</span>
+                        Quick<span className={selectedRole === 'admin' ? 'text-red-500' : 'text-indigo-600'}>Serve</span>
                     </span>
                 </div>
 
                 {/* Role Indicator */}
                 <div className="flex justify-center">
-                    <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${
-                        selectedRole === 'customer'
-                            ? 'bg-blue-100 text-blue-700'
-                            : 'bg-purple-100 text-purple-700'
-                    }`}>
-                        {selectedRole === 'customer' ? (
-                            <>
-                                <Users className="w-4 h-4" />
-                                Customer Portal
-                            </>
-                        ) : (
-                            <>
-                                <Briefcase className="w-4 h-4" />
-                                Service Provider Portal
-                            </>
-                        )}
-                    </div>
+                    {getRoleIndicator()}
                 </div>
             </div>
 
@@ -106,11 +125,12 @@ const AuthPages = ({ selectedRole = 'provider', onBack }) => {
                     {/* View Container */}
                     {view === 'login' ? (
                         <LoginForm 
-                            onSwitchToSignup={() => switchView('signup')} 
+                            onSwitchToSignup={selectedRole === 'admin' ? null : () => switchView('signup')} 
                             onLogin={handleLogin}
                             isLoading={isLoading}
                             error={error}
                             isCustomer={selectedRole === 'customer'}
+                            isAdmin={selectedRole === 'admin'}
                         />
                     ) : selectedRole === 'customer' ? (
                         <CustomerSignupForm 

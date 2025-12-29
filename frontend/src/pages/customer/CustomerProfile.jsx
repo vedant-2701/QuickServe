@@ -20,6 +20,12 @@ import {
 } from 'lucide-react';
 import useCustomerStore from '../../store/useCustomerStore';
 
+// Generic placeholder avatar using UI Avatars
+const getPlaceholderAvatar = (name) => {
+    const encodedName = encodeURIComponent(name || 'User');
+    return `https://ui-avatars.com/api/?name=${encodedName}&background=6366f1&color=fff&size=200`;
+};
+
 const CustomerProfile = ({ onLogout }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -113,7 +119,7 @@ const CustomerProfile = ({ onLogout }) => {
                     <div className="absolute -top-12 left-6">
                         <div className="relative">
                             <img
-                                src={profile?.avatarUrl || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop'}
+                                src={profile?.avatarUrl || getPlaceholderAvatar(profile?.fullName)}
                                 alt={profile?.fullName || 'Profile'}
                                 className="w-24 h-24 rounded-xl border-4 border-white object-cover shadow-lg"
                             />

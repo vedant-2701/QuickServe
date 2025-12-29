@@ -60,7 +60,8 @@ public class PublicServiceImpl implements PublicService {
             int page,
             int size) {
 
-        // Get all available providers
+        // Get all available providers (isAvailable = true)
+        // Note: Providers need to have isAvailable = true to appear in search results
         List<ServiceProvider> providers = serviceProviderRepository.findByIsAvailableTrue();
 
         // Filter by category
@@ -148,8 +149,8 @@ public class PublicServiceImpl implements PublicService {
         ServiceProvider provider = serviceProviderRepository.findById(providerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Provider not found"));
 
-        // Increment view count
-        provider.setProfileViews(provider.getProfileViews() + 1);
+        // Increment view count (handle null for existing records)
+        provider.setProfileViews(provider.getProfileViewsSafe() + 1);
         serviceProviderRepository.save(provider);
 
         return buildProviderDetailResponse(provider);
@@ -185,15 +186,15 @@ public class PublicServiceImpl implements PublicService {
                 .avatarUrl(user.getProfilePhotoUrl())
                 .primaryService(provider.getPrimaryService().getDisplayName())
                 .services(serviceNames)
-                .averageRating(provider.getAverageRating())
-                .totalReviews(provider.getTotalReviews())
-                .hourlyRate(provider.getHourlyRate())
+                .averageRating(provider.getAverageRatingSafe())
+                .totalReviews(provider.getTotalReviewsSafe())
+                .hourlyRate(provider.getHourlyRateSafe())
                 .location(provider.getCity() + ", " + provider.getState())
                 .verified(provider.isAadharVerified())
                 .isAvailable(provider.isAvailable())
                 .responseTime("< 1 hr") // TODO: Calculate actual response time
-                .completedJobs(provider.getCompletedJobs())
-                .experienceYears(provider.getExperienceYears())
+                .completedJobs(provider.getCompletedJobsSafe())
+                .experienceYears(provider.getExperienceYearsSafe())
                 .build();
     }
 
@@ -266,17 +267,17 @@ public class PublicServiceImpl implements PublicService {
                 .city(provider.getCity())
                 .state(provider.getState())
                 .pincode(provider.getPincode())
-                .serviceRadiusKm(provider.getServiceRadiusKm())
+                .serviceRadiusKm(provider.getServiceRadiusKmSafe())
                 .primaryService(provider.getPrimaryService().getDisplayName())
                 .secondaryServices(secondaryServiceNames)
-                .experienceYears(provider.getExperienceYears())
+                .experienceYears(provider.getExperienceYearsSafe())
                 .skills(provider.getSkills())
                 .languages(provider.getLanguages())
                 .certifications(certInfos)
-                .averageRating(provider.getAverageRating())
-                .totalReviews(provider.getTotalReviews())
-                .completedJobs(provider.getCompletedJobs())
-                .profileViews(provider.getProfileViews())
+                .averageRating(provider.getAverageRatingSafe())
+                .totalReviews(provider.getTotalReviewsSafe())
+                .completedJobs(provider.getCompletedJobsSafe())
+                .profileViews(provider.getProfileViewsSafe())
                 .verified(provider.isAadharVerified())
                 .isAvailable(provider.isAvailable())
                 .memberSince(user.getCreatedAt())

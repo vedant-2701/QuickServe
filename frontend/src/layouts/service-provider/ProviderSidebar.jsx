@@ -9,6 +9,16 @@ import {
     X,
 } from "lucide-react";
 
+// Get initials from name
+const getInitials = (name) => {
+    if (!name) return 'SP';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+};
+
 const ProviderSidebar = ({
     activeTab,
     setActiveTab,
@@ -16,6 +26,7 @@ const ProviderSidebar = ({
     setIsMobileMenuOpen,
     bookings,
     onLogout,
+    user,
 }) => {
     return (
         <aside
@@ -41,10 +52,10 @@ const ProviderSidebar = ({
             <div className="p-4">
                 <div className="flex items-center gap-3 p-3 mb-6 bg-slate-800 rounded-xl">
                     <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-lg font-bold">
-                        JD
+                        {getInitials(user?.fullName)}
                     </div>
                     <div className="overflow-hidden">
-                        <h4 className="font-bold text-sm truncate">John Doe</h4>
+                        <h4 className="font-bold text-sm truncate">{user?.fullName || 'Service Provider'}</h4>
                         <p className="text-xs text-slate-400 truncate">
                             Service Provider
                         </p>

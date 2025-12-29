@@ -11,9 +11,24 @@ import {
     Zap,
     Filter,
     ArrowRight,
-    Loader2
+    Loader2,
+    Wrench,
+    Hammer,
+    Paintbrush,
+    Wind,
+    TreeDeciduous,
+    Bug,
+    Settings,
+    Home,
+    Square
 } from 'lucide-react';
 import useCustomerStore from '../../store/useCustomerStore';
+
+// Generic placeholder avatar using UI Avatars
+const getPlaceholderAvatar = (name) => {
+    const encodedName = encodeURIComponent(name || 'Provider');
+    return `https://ui-avatars.com/api/?name=${encodedName}&background=6366f1&color=fff&size=100`;
+};
 
 const CustomerHome = ({ onNavigate, onSearch }) => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -33,19 +48,24 @@ const CustomerHome = ({ onNavigate, onSearch }) => {
         searchProviders({ sortBy: 'rating', limit: 3 });
     }, [fetchCategories, searchProviders]);
 
-    const categoryIcons = {
-        'Plumbing': { icon: '🔧', color: 'bg-blue-100 text-blue-600' },
-        'Electrical': { icon: '⚡', color: 'bg-yellow-100 text-yellow-600' },
-        'Cleaning': { icon: '🧹', color: 'bg-green-100 text-green-600' },
-        'Carpentry': { icon: '🪚', color: 'bg-orange-100 text-orange-600' },
-        'Painting': { icon: '🎨', color: 'bg-purple-100 text-purple-600' },
-        'HVAC': { icon: '❄️', color: 'bg-cyan-100 text-cyan-600' },
-        'Pest Control': { icon: '🐛', color: 'bg-red-100 text-red-600' },
-        'Appliance Repair': { icon: '🔌', color: 'bg-indigo-100 text-indigo-600' },
+    // Map backend icon names to Lucide components and colors
+    const categoryIconMap = {
+        'wrench': { Icon: Wrench, color: 'bg-blue-100 text-blue-600' },
+        'zap': { Icon: Zap, color: 'bg-yellow-100 text-yellow-600' },
+        'sparkles': { Icon: Sparkles, color: 'bg-green-100 text-green-600' },
+        'hammer': { Icon: Hammer, color: 'bg-orange-100 text-orange-600' },
+        'paintbrush': { Icon: Paintbrush, color: 'bg-purple-100 text-purple-600' },
+        'wind': { Icon: Wind, color: 'bg-cyan-100 text-cyan-600' },
+        'tree-deciduous': { Icon: TreeDeciduous, color: 'bg-emerald-100 text-emerald-600' },
+        'bug': { Icon: Bug, color: 'bg-red-100 text-red-600' },
+        'settings': { Icon: Settings, color: 'bg-indigo-100 text-indigo-600' },
+        'shield': { Icon: Shield, color: 'bg-violet-100 text-violet-600' },
+        'home': { Icon: Home, color: 'bg-amber-100 text-amber-600' },
+        'square': { Icon: Square, color: 'bg-teal-100 text-teal-600' },
     };
 
-    const getIconForCategory = (categoryName) => {
-        return categoryIcons[categoryName] || { icon: '🛠️', color: 'bg-slate-100 text-slate-600' };
+    const getIconForCategory = (iconName) => {
+        return categoryIconMap[iconName] || { Icon: Wrench, color: 'bg-slate-100 text-slate-600' };
     };
 
     const handleSearch = (e) => {
@@ -147,17 +167,17 @@ const CustomerHome = ({ onNavigate, onSearch }) => {
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {categories.slice(0, 8).map((category) => {
-                        const { icon, color } = getIconForCategory(category.name);
+                        const { Icon, color } = getIconForCategory(category.icon);
                         return (
                             <button
-                                key={category.name}
-                                onClick={() => onNavigate && onNavigate('browse', { category: category.name })}
+                                key={category.value}
+                                onClick={() => onNavigate && onNavigate('browse', { category: category.value })}
                                 className="bg-white rounded-xl p-5 border border-slate-200 hover:border-indigo-300 hover:shadow-lg transition-all group text-left"
                             >
-                                <div className={`w-12 h-12 ${color} rounded-xl flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition`}>
-                                    {icon}
+                                <div className={`w-12 h-12 ${color} rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition`}>
+                                    <Icon className="w-6 h-6" />
                                 </div>
-                                <h3 className="font-semibold text-slate-800 mb-1">{category.name}</h3>
+                                <h3 className="font-semibold text-slate-800 mb-1">{category.displayName}</h3>
                                 <p className="text-sm text-slate-500">{category.providerCount || 0} providers</p>
                             </button>
                         );
@@ -195,7 +215,7 @@ const CustomerHome = ({ onNavigate, onSearch }) => {
                                 <div className="flex items-start gap-4 mb-4">
                                     <div className="relative">
                                         <img
-                                            src={provider.avatarUrl || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop'}
+                                            src={provider.avatarUrl || getPlaceholderAvatar(provider.name)}
                                             alt={provider.name}
                                             className="w-16 h-16 rounded-full object-cover"
                                         />
@@ -211,7 +231,7 @@ const CustomerHome = ({ onNavigate, onSearch }) => {
                                         <div className="flex items-center gap-2 mt-1">
                                             <div className="flex items-center gap-1">
                                                 <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                                                <span className="font-semibold text-slate-800">{provider.avgRating?.toFixed(1) || 'New'}</span>
+                                                <span className="font-semibold text-slate-800">{provider.averageRating?.toFixed(1) || 'New'}</span>
                                             </div>
                                             <span className="text-slate-400">•</span>
                                             <span className="text-sm text-slate-500">{provider.totalReviews || 0} reviews</span>
@@ -222,7 +242,7 @@ const CustomerHome = ({ onNavigate, onSearch }) => {
                                 <div className="flex items-center justify-between pt-4 border-t border-slate-100">
                                     <div className="flex items-center gap-2 text-sm text-slate-500">
                                         <MapPin className="w-4 h-4" />
-                                        {provider.city || 'Location not set'}
+                                        {provider.location || 'Location not set'}
                                     </div>
                                     <div className="font-bold text-indigo-600">
                                         ₹{provider.hourlyRate || 0}/hr

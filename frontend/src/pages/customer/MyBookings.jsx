@@ -13,20 +13,29 @@ import {
     XCircle,
     AlertCircle,
     IndianRupee,
-    Loader2
+    Loader2,
+    X
 } from 'lucide-react';
 import useCustomerStore from '../../store/useCustomerStore';
+
+// Generic placeholder avatar using UI Avatars
+const getPlaceholderAvatar = (name) => {
+    const encodedName = encodeURIComponent(name || 'User');
+    return `https://ui-avatars.com/api/?name=${encodedName}&background=6366f1&color=fff&size=100`;
+};
 
 const MyBookings = ({ onNavigate }) => {
     const [filter, setFilter] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [cancellingId, setCancellingId] = useState(null);
+    const [reviewModalData, setReviewModalData] = useState(null);
 
     const { 
         bookings, 
         isLoadingBookings, 
         fetchBookings, 
-        cancelBooking 
+        cancelBooking,
+        createReview 
     } = useCustomerStore();
 
     useEffect(() => {
@@ -160,7 +169,7 @@ const MyBookings = ({ onNavigate }) => {
                     { label: 'Total Bookings', value: bookings.length, color: 'bg-indigo-50 text-indigo-600' },
                     { label: 'Pending', value: bookings.filter(b => b.status?.toLowerCase() === 'pending').length, color: 'bg-yellow-50 text-yellow-600' },
                     { label: 'Completed', value: bookings.filter(b => b.status?.toLowerCase() === 'completed').length, color: 'bg-green-50 text-green-600' },
-                    { label: 'Upcoming', value: bookings.filter(b => isUpcoming(b.scheduledDate) && b.status?.toLowerCase() !== 'cancelled').length, color: 'bg-blue-50 text-blue-600' },
+                    { label: 'Upcoming', value: bookings.filter(b => isUpcoming(b.bookingDate || b.scheduledDate) && b.status?.toLowerCase() !== 'cancelled').length, color: 'bg-blue-50 text-blue-600' },
                 ].map((stat, index) => (
                     <div key={index} className={`${stat.color} rounded-xl p-4`}>
                         <div className="text-2xl font-bold">{stat.value}</div>
@@ -206,7 +215,7 @@ const MyBookings = ({ onNavigate }) => {
                                     {/* Provider Info */}
                                     <div className="flex items-center gap-4">
                                         <img
-                                            src={booking.providerAvatarUrl || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop'}
+                                            src={booking.providerAvatar || booking.providerAvatarUrl || getPlaceholderAvatar(booking.providerName)}
                                             alt={booking.providerName}
                                             className="w-16 h-16 rounded-xl object-cover"
                                         />
@@ -228,13 +237,13 @@ const MyBookings = ({ onNavigate }) => {
                                         <div>
                                             <div className="text-sm text-slate-500">Date & Time</div>
                                             <div className="font-semibold text-slate-800">
-                                                {formatDate(booking.scheduledDate)}
+                                                {formatDate(booking.bookingDate || booking.scheduledDate)}
                                             </div>
-                                            <div className="text-sm text-slate-600">{formatTime(booking.scheduledTime)}</div>
+                                            <div className="text-sm text-slate-600">{formatTime(booking.bookingTime || booking.scheduledTime)}</div>
                                         </div>
                                         <div>
                                             <div className="text-sm text-slate-500">Amount</div>
-                                            <div className="font-bold text-indigo-600 text-lg">₹{booking.totalAmount || 0}</div>
+                                            <div className="font-bold text-indigo-600 text-lg">₹{booking.price || booking.totalAmount || 0}</div>
                                         </div>
                                     </div>
 
@@ -274,17 +283,18 @@ const MyBookings = ({ onNavigate }) => {
                                 </div>
 
                                 {/* Address */}
-                                {booking.serviceAddress && (
+                                {/* Address */}
+                                {(booking.address || booking.serviceAddress) && (
                                     <div className="mt-4 pt-4 border-t border-slate-100 flex items-start gap-2 text-sm text-slate-500">
                                         <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                                        <span>{booking.serviceAddress}</span>
+                                        <span>{booking.address || booking.serviceAddress}</span>
                                     </div>
                                 )}
 
                                 {/* Notes */}
-                                {booking.customerNotes && (
+                                {(booking.notes || booking.customerNotes) && (
                                     <div className="mt-2 text-sm text-slate-500 italic">
-                                        Note: {booking.customerNotes}
+                                        Note: {booking.notes || booking.customerNotes}
                                     </div>
                                 )}
 
@@ -306,7 +316,11 @@ const MyBookings = ({ onNavigate }) => {
                                 {booking.status?.toLowerCase() === 'completed' && !booking.hasReview && (
                                     <div className="mt-4 pt-4 border-t border-slate-100">
                                         <button 
-                                            onClick={() => onNavigate && onNavigate('provider', { id: booking.providerId, showReview: true })}
+                                            onClick={() => setReviewModalData({
+                                                bookingId: booking.id,
+                                                providerName: booking.providerName,
+                                                serviceName: booking.serviceName
+                                            })}
                                             className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition flex items-center gap-2"
                                         >
                                             <Star className="w-4 h-4" />
@@ -319,6 +333,176 @@ const MyBookings = ({ onNavigate }) => {
                     })}
                 </div>
             )}
+
+            {/* Review Modal */}
+            {reviewModalData && (
+                <ReviewModal
+                    bookingId={reviewModalData.bookingId}
+                    providerName={reviewModalData.providerName}
+                    serviceName={reviewModalData.serviceName}
+                    onClose={() => setReviewModalData(null)}
+                    onSuccess={() => {
+                        setReviewModalData(null);
+                        fetchBookings(); // Refresh bookings to update hasReview status
+                    }}
+                    createReview={createReview}
+                />
+            )}
+        </div>
+    );
+};
+
+// Review Modal Component
+const ReviewModal = ({ bookingId, providerName, serviceName, onClose, onSuccess, createReview }) => {
+    const [rating, setRating] = useState(0);
+    const [hoverRating, setHoverRating] = useState(0);
+    const [comment, setComment] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState(false);
+
+    const handleSubmit = async () => {
+        if (rating === 0) {
+            setError('Please select a rating');
+            return;
+        }
+
+        setIsSubmitting(true);
+        setError('');
+
+        try {
+            await createReview({
+                bookingId: Number(bookingId),
+                rating: rating,
+                comment: comment.trim() || null
+            });
+            
+            setSuccess(true);
+            setTimeout(() => {
+                onSuccess && onSuccess();
+            }, 1500);
+        } catch (err) {
+            const errorMessage = err.response?.data?.message || err.message || 'Failed to submit review. Please try again.';
+            setError(errorMessage);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    if (success) {
+        return (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                <div className="bg-white rounded-2xl max-w-md w-full p-8 text-center">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <CheckCircle className="w-8 h-8 text-green-600" />
+                    </div>
+                    <h2 className="text-xl font-bold text-slate-800 mb-2">Review Submitted!</h2>
+                    <p className="text-slate-500">Thank you for your feedback.</p>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+                {/* Header */}
+                <div className="p-6 border-b border-slate-100">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-xl font-bold text-slate-800">Write a Review</h2>
+                        <button
+                            onClick={onClose}
+                            className="p-2 hover:bg-slate-100 rounded-full transition"
+                        >
+                            <X className="w-5 h-5 text-slate-500" />
+                        </button>
+                    </div>
+                    <p className="text-slate-500 text-sm mt-1">
+                        Rate your experience with {providerName} for {serviceName}
+                    </p>
+                </div>
+
+                {/* Content */}
+                <div className="p-6 space-y-6">
+                    {/* Rating Selection */}
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-3">
+                            How would you rate your experience?
+                        </label>
+                        <div className="flex items-center justify-center gap-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                    key={star}
+                                    onClick={() => setRating(star)}
+                                    onMouseEnter={() => setHoverRating(star)}
+                                    onMouseLeave={() => setHoverRating(0)}
+                                    className="p-1 transition-transform hover:scale-110"
+                                >
+                                    <Star
+                                        className={`w-10 h-10 ${
+                                            star <= (hoverRating || rating)
+                                                ? 'text-yellow-500 fill-yellow-500'
+                                                : 'text-slate-300'
+                                        } transition-colors`}
+                                    />
+                                </button>
+                            ))}
+                        </div>
+                        <div className="text-center mt-2 text-sm text-slate-500">
+                            {rating === 0 && 'Select a rating'}
+                            {rating === 1 && 'Poor'}
+                            {rating === 2 && 'Fair'}
+                            {rating === 3 && 'Good'}
+                            {rating === 4 && 'Very Good'}
+                            {rating === 5 && 'Excellent'}
+                        </div>
+                    </div>
+
+                    {/* Comment */}
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Your Review (Optional)
+                        </label>
+                        <textarea
+                            value={comment}
+                            onChange={(e) => setComment(e.target.value)}
+                            placeholder="Tell others about your experience..."
+                            rows={4}
+                            maxLength={1000}
+                            className="w-full px-4 py-3 border border-slate-200 rounded-xl resize-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+                        />
+                        <div className="text-right text-xs text-slate-400 mt-1">
+                            {comment.length}/1000 characters
+                        </div>
+                    </div>
+
+                    {/* Error Message */}
+                    {error && (
+                        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                            {error}
+                        </div>
+                    )}
+
+                    {/* Submit Button */}
+                    <button
+                        onClick={handleSubmit}
+                        disabled={rating === 0 || isSubmitting}
+                        className="w-full py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition disabled:bg-slate-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                        {isSubmitting ? (
+                            <>
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                                Submitting...
+                            </>
+                        ) : (
+                            <>
+                                <Star className="w-5 h-5" />
+                                Submit Review
+                            </>
+                        )}
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };

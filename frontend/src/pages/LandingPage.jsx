@@ -731,6 +731,12 @@ const LandingPage = ({ onSelectRole }) => {
                             <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
                             <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
                             <a href="#" className="hover:text-white transition-colors">Cookie Policy</a>
+                            <button 
+                                onClick={() => onSelectRole('admin')}
+                                className="hover:text-white transition-colors"
+                            >
+                                Admin
+                            </button>
                         </div>
                         <p className="text-slate-400 text-sm flex items-center gap-1">
                             Made with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> in India

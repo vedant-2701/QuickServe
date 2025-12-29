@@ -18,9 +18,17 @@ import ProviderSettingsView from "./pages/service-provider/SettingsView";
 // Customer pages
 import CustomerDashboard from "./pages/customer/CustomerDashboard";
 
+// Admin pages and layouts
+import AdminLayout from "./layouts/admin/AdminLayout";
+import AdminDashboardView from "./pages/admin/AdminDashboardView";
+import AdminUsersView from "./pages/admin/AdminUsersView";
+import AdminProvidersView from "./pages/admin/AdminProvidersView";
+import AdminBookingsView from "./pages/admin/AdminBookingsView";
+
 // Stores
 import useAuthStore from "./store/useAuthStore";
 import useDashboardStore from "./store/useDashboardStore";
+import useAdminStore from "./store/useAdminStore";
 
 // Loading spinner component
 function LoadingSpinner({ message = "Loading..." }) {
@@ -52,6 +60,8 @@ function ProtectedRoute({ children, allowedRole }) {
             return <Navigate to="/customer" replace />;
         } else if (user?.role === 'SERVICE_PROVIDER') {
             return <Navigate to="/provider" replace />;
+        } else if (user?.role === 'ADMIN') {
+            return <Navigate to="/admin" replace />;
         }
         return <Navigate to="/" replace />;
     }
@@ -304,6 +314,8 @@ function LandingPageWrapper() {
                 navigate('/customer', { replace: true });
             } else if (user.role === 'SERVICE_PROVIDER') {
                 navigate('/provider', { replace: true });
+            } else if (user.role === 'ADMIN') {
+                navigate('/admin', { replace: true });
             }
         }
     }, [isAuthenticated, user, navigate]);
@@ -341,6 +353,18 @@ export default function App() {
                         <ProviderDashboardLayout />
                     </ProtectedRoute>
                 } />
+                
+                {/* Admin routes */}
+                <Route path="/admin" element={
+                    <ProtectedRoute allowedRole="ADMIN">
+                        <AdminLayout />
+                    </ProtectedRoute>
+                }>
+                    <Route index element={<AdminDashboardView />} />
+                    <Route path="users" element={<AdminUsersView />} />
+                    <Route path="providers" element={<AdminProvidersView />} />
+                    <Route path="bookings" element={<AdminBookingsView />} />
+                </Route>
                 
                 {/* Catch all - redirect to home */}
                 <Route path="*" element={<Navigate to="/" replace />} />

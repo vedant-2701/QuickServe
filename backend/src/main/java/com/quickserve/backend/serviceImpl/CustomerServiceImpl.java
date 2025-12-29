@@ -437,7 +437,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .providerName(providerUser.getFullName())
                 .providerPhone(providerUser.getPhone())
                 .providerAvatar(providerUser.getProfilePhotoUrl())
-                .providerRating(provider.getAverageRating())
+                .providerRating(provider.getAverageRatingSafe())
                 .providerVerified(provider.isAadharVerified())
                 .serviceId(service.getId())
                 .serviceName(service.getName())

@@ -13,6 +13,12 @@ import {
     MapPin
 } from 'lucide-react';
 
+// Generic placeholder avatar using UI Avatars
+const getPlaceholderAvatar = (name) => {
+    const encodedName = encodeURIComponent(name || 'User');
+    return `https://ui-avatars.com/api/?name=${encodedName}&background=6366f1&color=fff&size=40`;
+};
+
 const CustomerHeader = ({ user, onMenuToggle, onNavigate, onLogout }) => {
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
@@ -168,7 +174,7 @@ const CustomerHeader = ({ user, onMenuToggle, onNavigate, onLogout }) => {
                                 className="flex items-center gap-3 p-1.5 hover:bg-slate-100 rounded-lg transition"
                             >
                                 <img
-                                    src={user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop'}
+                                    src={user?.avatar || getPlaceholderAvatar(user?.name)}
                                     alt="Profile"
                                     className="w-8 h-8 rounded-lg object-cover"
                                 />

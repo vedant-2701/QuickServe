@@ -32,6 +32,7 @@ public class ServiceProvider {
     @Column(nullable = false)
     private String aadharNumber;
 
+    @Builder.Default
     private boolean aadharVerified = false;
 
     // Address Information
@@ -56,6 +57,7 @@ public class ServiceProvider {
     @CollectionTable(name = "provider_secondary_services", joinColumns = @JoinColumn(name = "provider_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "service_category")
+    @Builder.Default
     private List<ServiceCategory> secondaryServices = new ArrayList<>();
 
     @Column(nullable = false)
@@ -74,25 +76,35 @@ public class ServiceProvider {
     @ElementCollection
     @CollectionTable(name = "provider_languages", joinColumns = @JoinColumn(name = "provider_id"))
     @Column(name = "language")
+    @Builder.Default
     private List<String> languages = new ArrayList<>();
 
     // Skills
     @ElementCollection
     @CollectionTable(name = "provider_skills", joinColumns = @JoinColumn(name = "provider_id"))
     @Column(name = "skill")
+    @Builder.Default
     private List<String> skills = new ArrayList<>();
 
     // Ratings and Stats
     @Column(precision = 3, scale = 2)
+    @Builder.Default
     private BigDecimal averageRating = BigDecimal.ZERO;
 
+    @Builder.Default
     private Integer totalReviews = 0;
 
+    @Builder.Default
     private Integer completedJobs = 0;
 
+    @Builder.Default
     private Integer profileViews = 0;
 
+    @Builder.Default
     private boolean isAvailable = true;
+    
+    @Builder.Default
+    private boolean isVerified = false;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -103,14 +115,47 @@ public class ServiceProvider {
 
     // One-to-Many relationships
     @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<ProviderService> services = new ArrayList<>();
 
     @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<WorkingHours> workingHours = new ArrayList<>();
 
     @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Booking> bookings = new ArrayList<>();
 
     @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Certification> certifications = new ArrayList<>();
+
+    // Null-safe getters for fields that may be null in existing database records
+    public Integer getTotalReviewsSafe() {
+        return totalReviews != null ? totalReviews : 0;
+    }
+
+    public Integer getCompletedJobsSafe() {
+        return completedJobs != null ? completedJobs : 0;
+    }
+
+    public Integer getProfileViewsSafe() {
+        return profileViews != null ? profileViews : 0;
+    }
+
+    public BigDecimal getAverageRatingSafe() {
+        return averageRating != null ? averageRating : BigDecimal.ZERO;
+    }
+
+    public Integer getExperienceYearsSafe() {
+        return experienceYears != null ? experienceYears : 0;
+    }
+
+    public Integer getServiceRadiusKmSafe() {
+        return serviceRadiusKm != null ? serviceRadiusKm : 5;
+    }
+
+    public BigDecimal getHourlyRateSafe() {
+        return hourlyRate != null ? hourlyRate : BigDecimal.ZERO;
+    }
 }

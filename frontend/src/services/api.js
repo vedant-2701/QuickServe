@@ -155,4 +155,32 @@ export const servicesApi = {
     searchProviders: (params) => api.get('/public/providers', { params }),
 };
 
+// Admin API
+export const adminApi = {
+    // Dashboard
+    getDashboardStats: () => api.get('/admin/dashboard'),
+    
+    // User Management
+    getUsers: (params) => api.get('/admin/users', { params }),
+    getUserById: (userId) => api.get(`/admin/users/${userId}`),
+    updateUserStatus: (userId, data) => api.patch(`/admin/users/${userId}/status`, data),
+    deleteUser: (userId) => api.delete(`/admin/users/${userId}`),
+    
+    // Provider Management
+    getProviders: (params) => api.get('/admin/providers', { params }),
+    getProviderById: (providerId) => api.get(`/admin/providers/${providerId}`),
+    verifyProvider: (providerId, data) => api.patch(`/admin/providers/${providerId}/verify`, data),
+    updateProviderStatus: (providerId, data) => api.patch(`/admin/providers/${providerId}/status`, data),
+    
+    // Booking Management
+    getBookings: (params) => api.get('/admin/bookings', { params }),
+    getBookingById: (bookingId) => api.get(`/admin/bookings/${bookingId}`),
+    updateBookingStatus: (bookingId, data) => api.patch(`/admin/bookings/${bookingId}/status`, data),
+    
+    // Analytics
+    getRevenueAnalytics: (period) => api.get('/admin/analytics/revenue', { params: { period } }),
+    getBookingAnalytics: (period) => api.get('/admin/analytics/bookings', { params: { period } }),
+    getUserGrowthAnalytics: (period) => api.get('/admin/analytics/users', { params: { period } }),
+};
+
 export default api;

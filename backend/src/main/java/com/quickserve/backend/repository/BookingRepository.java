@@ -51,4 +51,23 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     // Upcoming bookings (today and future, pending or confirmed)
     @Query("SELECT b FROM Booking b WHERE b.provider = :provider AND b.bookingDate >= :today AND b.status IN ('PENDING', 'CONFIRMED') ORDER BY b.bookingDate ASC, b.bookingTime ASC")
     List<Booking> findUpcomingByProvider(@Param("provider") ServiceProvider provider, @Param("today") LocalDate today);
+    
+    // Admin queries
+    List<Booking> findByStatus(BookingStatus status);
+    
+    long countByStatus(BookingStatus status);
+    
+    List<Booking> findTop10ByOrderByCreatedAtDesc();
+    
+    // Provider ID based queries
+    List<Booking> findByProviderId(Long providerId);
+    
+    int countByProviderId(Long providerId);
+    
+    int countByProviderIdAndStatus(Long providerId, BookingStatus status);
+    
+    // Customer ID based queries  
+    List<Booking> findByCustomerId(Long customerId);
+    
+    int countByCustomerId(Long customerId);
 }

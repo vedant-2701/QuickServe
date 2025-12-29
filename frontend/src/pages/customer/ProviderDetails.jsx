@@ -22,9 +22,16 @@ import {
 } from 'lucide-react';
 import useCustomerStore from '../../store/useCustomerStore';
 
-const ProviderDetails = ({ providerId, onNavigate, onBook }) => {
+// Generic placeholder avatar using UI Avatars
+const getPlaceholderAvatar = (name) => {
+    const encodedName = encodeURIComponent(name || 'User');
+    return `https://ui-avatars.com/api/?name=${encodedName}&background=6366f1&color=fff&size=200`;
+};
+
+const ProviderDetails = ({ providerId, showReviewModal, bookingId, onNavigate, onBook }) => {
     const [selectedService, setSelectedService] = useState(null);
     const [showBookingModal, setShowBookingModal] = useState(false);
+    const [showReviewForm, setShowReviewForm] = useState(false);
     const [activeTab, setActiveTab] = useState('services');
     const [isFavorite, setIsFavorite] = useState(false);
 
@@ -32,7 +39,6 @@ const ProviderDetails = ({ providerId, onNavigate, onBook }) => {
         selectedProvider: provider, 
         isLoading, 
         fetchProviderDetails, 
-        createBooking,
         clearSelectedProvider 
     } = useCustomerStore();
 
@@ -42,6 +48,18 @@ const ProviderDetails = ({ providerId, onNavigate, onBook }) => {
         }
         return () => clearSelectedProvider();
     }, [providerId, fetchProviderDetails, clearSelectedProvider]);
+
+    // Open review modal if showReviewModal prop is true
+    useEffect(() => {
+        if (showReviewModal && provider && !showReviewForm) {
+            // Use timeout to avoid setState in sync effect
+            const timer = setTimeout(() => {
+                setShowReviewForm(true);
+                setActiveTab('reviews');
+            }, 0);
+            return () => clearTimeout(timer);
+        }
+    }, [showReviewModal, provider, showReviewForm]);
 
     const handleBookService = (service) => {
         setSelectedService(service);
@@ -103,7 +121,7 @@ const ProviderDetails = ({ providerId, onNavigate, onBook }) => {
                         {/* Profile Image */}
                         <div className="relative flex-shrink-0">
                             <img
-                                src={displayProvider.avatarUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop'}
+                                src={displayProvider.avatarUrl || getPlaceholderAvatar(displayProvider.name)}
                                 alt={displayProvider.name}
                                 className="w-32 h-32 rounded-2xl border-4 border-white object-cover shadow-lg"
                             />
@@ -262,18 +280,27 @@ const ProviderDetails = ({ providerId, onNavigate, onBook }) => {
                                             <div className="text-sm text-slate-500">{displayProvider.totalReviews || 0} reviews</div>
                                         </div>
                                         <div className="flex-1 space-y-2">
-                                            {[5, 4, 3, 2, 1].map((rating) => (
-                                                <div key={rating} className="flex items-center gap-3">
-                                                    <span className="text-sm text-slate-600 w-3">{rating}</span>
-                                                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                                                    <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
-                                                        <div 
-                                                            className="h-full bg-yellow-500 rounded-full"
-                                                            style={{ width: `${rating === 5 ? 70 : rating === 4 ? 20 : 5}%` }}
-                                                        ></div>
+                                            {[5, 4, 3, 2, 1].map((rating) => {
+                                                // Calculate the count and percentage for each rating
+                                                const reviews = displayProvider.reviews || [];
+                                                const totalReviews = displayProvider.totalReviews || reviews.length || 0;
+                                                const ratingCount = reviews.filter(r => r.rating === rating).length;
+                                                const percentage = totalReviews > 0 ? (ratingCount / totalReviews) * 100 : 0;
+                                                
+                                                return (
+                                                    <div key={rating} className="flex items-center gap-3">
+                                                        <span className="text-sm text-slate-600 w-3">{rating}</span>
+                                                        <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                                                        <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
+                                                            <div 
+                                                                className="h-full bg-yellow-500 rounded-full transition-all duration-300"
+                                                                style={{ width: `${percentage}%` }}
+                                                            ></div>
+                                                        </div>
+                                                        <span className="text-xs text-slate-400 w-8">{ratingCount}</span>
                                                     </div>
-                                                </div>
-                                            ))}
+                                                );
+                                            })}
                                         </div>
                                     </div>
 
@@ -283,7 +310,7 @@ const ProviderDetails = ({ providerId, onNavigate, onBook }) => {
                                             <div key={review.id} className="border-b border-slate-100 pb-6 last:border-0">
                                                 <div className="flex items-start gap-4">
                                                     <img
-                                                        src={review.customerAvatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop'}
+                                                        src={review.customerAvatar || getPlaceholderAvatar(review.customerName)}
                                                         alt={review.customerName}
                                                         className="w-12 h-12 rounded-full object-cover"
                                                     />
@@ -429,6 +456,20 @@ const ProviderDetails = ({ providerId, onNavigate, onBook }) => {
                     onBook={onBook}
                 />
             )}
+
+            {/* Review Modal */}
+            {showReviewForm && (
+                <ReviewModal
+                    provider={displayProvider}
+                    bookingId={bookingId}
+                    onClose={() => setShowReviewForm(false)}
+                    onSuccess={() => {
+                        setShowReviewForm(false);
+                        // Refresh provider details to show new review
+                        fetchProviderDetails(providerId);
+                    }}
+                />
+            )}
         </div>
     );
 };
@@ -469,10 +510,10 @@ const BookingModal = ({ provider, selectedService, onClose, onBook }) => {
             const bookingData = {
                 providerId: provider.id,
                 serviceId: selectedServiceId,
-                scheduledDate: selectedDate,
-                scheduledTime: selectedTime,
-                serviceAddress: address,
-                customerNotes: notes
+                bookingDate: selectedDate,
+                bookingTime: selectedTime,
+                address: address,
+                notes: notes
             };
             await createBooking(bookingData);
             if (onBook) {
@@ -669,6 +710,168 @@ const BookingModal = ({ provider, selectedService, onClose, onBook }) => {
                             </button>
                         )}
                     </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Review Modal Component
+const ReviewModal = ({ provider, bookingId, onClose, onSuccess }) => {
+    const [rating, setRating] = useState(0);
+    const [hoverRating, setHoverRating] = useState(0);
+    const [comment, setComment] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState(false);
+
+    const { createReview } = useCustomerStore();
+
+    const handleSubmit = async () => {
+        if (rating === 0) {
+            setError('Please select a rating');
+            return;
+        }
+
+        if (!bookingId) {
+            setError('Booking ID is required. Please try again from your bookings page.');
+            return;
+        }
+
+        setIsSubmitting(true);
+        setError('');
+
+        try {
+            await createReview({
+                bookingId: Number(bookingId),
+                rating: rating,
+                comment: comment.trim() || null
+            });
+            
+            setSuccess(true);
+            setTimeout(() => {
+                onSuccess && onSuccess();
+            }, 1500);
+        } catch (err) {
+            const errorMessage = err.response?.data?.message || err.message || 'Failed to submit review. Please try again.';
+            setError(errorMessage);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    if (success) {
+        return (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                <div className="bg-white rounded-2xl max-w-md w-full p-8 text-center">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <CheckCircle className="w-8 h-8 text-green-600" />
+                    </div>
+                    <h2 className="text-xl font-bold text-slate-800 mb-2">Review Submitted!</h2>
+                    <p className="text-slate-500">Thank you for your feedback.</p>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+                {/* Header */}
+                <div className="p-6 border-b border-slate-100">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-xl font-bold text-slate-800">Write a Review</h2>
+                        <button
+                            onClick={onClose}
+                            className="p-2 hover:bg-slate-100 rounded-full transition"
+                        >
+                            <X className="w-5 h-5 text-slate-500" />
+                        </button>
+                    </div>
+                    <p className="text-slate-500 text-sm mt-1">
+                        Share your experience with {provider?.name || 'this provider'}
+                    </p>
+                </div>
+
+                {/* Content */}
+                <div className="p-6 space-y-6">
+                    {/* Rating Selection */}
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-3">
+                            How would you rate your experience?
+                        </label>
+                        <div className="flex items-center justify-center gap-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                    key={star}
+                                    onClick={() => setRating(star)}
+                                    onMouseEnter={() => setHoverRating(star)}
+                                    onMouseLeave={() => setHoverRating(0)}
+                                    className="p-1 transition-transform hover:scale-110"
+                                >
+                                    <Star
+                                        className={`w-10 h-10 ${
+                                            star <= (hoverRating || rating)
+                                                ? 'text-yellow-500 fill-yellow-500'
+                                                : 'text-slate-300'
+                                        } transition-colors`}
+                                    />
+                                </button>
+                            ))}
+                        </div>
+                        <div className="text-center mt-2 text-sm text-slate-500">
+                            {rating === 0 && 'Select a rating'}
+                            {rating === 1 && 'Poor'}
+                            {rating === 2 && 'Fair'}
+                            {rating === 3 && 'Good'}
+                            {rating === 4 && 'Very Good'}
+                            {rating === 5 && 'Excellent'}
+                        </div>
+                    </div>
+
+                    {/* Comment */}
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Your Review (Optional)
+                        </label>
+                        <textarea
+                            value={comment}
+                            onChange={(e) => setComment(e.target.value)}
+                            placeholder="Tell others about your experience..."
+                            rows={4}
+                            maxLength={1000}
+                            className="w-full px-4 py-3 border border-slate-200 rounded-xl resize-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+                        />
+                        <div className="text-right text-xs text-slate-400 mt-1">
+                            {comment.length}/1000 characters
+                        </div>
+                    </div>
+
+                    {/* Error Message */}
+                    {error && (
+                        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                            {error}
+                        </div>
+                    )}
+
+                    {/* Submit Button */}
+                    <button
+                        onClick={handleSubmit}
+                        disabled={rating === 0 || isSubmitting}
+                        className="w-full py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition disabled:bg-slate-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                        {isSubmitting ? (
+                            <>
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                                Submitting...
+                            </>
+                        ) : (
+                            <>
+                                <Star className="w-5 h-5" />
+                                Submit Review
+                            </>
+                        )}
+                    </button>
                 </div>
             </div>
         </div>
