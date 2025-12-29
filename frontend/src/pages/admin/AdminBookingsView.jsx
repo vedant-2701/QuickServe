@@ -213,11 +213,11 @@ const AdminBookingsView = () => {
                                                 </td>
                                                 <td className="py-4 px-6 text-sm text-gray-600">{booking.serviceName}</td>
                                                 <td className="py-4 px-6">
-                                                    <div className="text-sm text-gray-900">{formatDate(booking.bookingDate)}</div>
-                                                    <div className="text-xs text-gray-500">{formatTime(booking.bookingTime)}</div>
+                                                    <div className="text-sm text-gray-900">{formatDate(booking.scheduledDate)}</div>
+                                                    <div className="text-xs text-gray-500">{formatTime(booking.scheduledTime)}</div>
                                                 </td>
                                                 <td className="py-4 px-6 text-sm font-semibold text-green-600">
-                                                    ₹{booking.price?.toLocaleString() || 0}
+                                                    ₹{booking.amount?.toLocaleString() || 0}
                                                 </td>
                                                 <td className="py-4 px-6">
                                                     <StatusBadge status={booking.status} />
@@ -380,7 +380,7 @@ const AdminBookingsView = () => {
                             {/* Status */}
                             <div className="flex items-center justify-between">
                                 <StatusBadge status={selectedBooking.status} />
-                                <span className="text-2xl font-bold text-green-600">₹{selectedBooking.price?.toLocaleString() || 0}</span>
+                                <span className="text-2xl font-bold text-green-600">₹{selectedBooking.amount?.toLocaleString() || 0}</span>
                             </div>
 
                             {/* Service Info */}
@@ -399,14 +399,14 @@ const AdminBookingsView = () => {
                                         <Calendar className="w-5 h-5 text-gray-400 mr-2" />
                                         <h4 className="font-semibold text-gray-900">Date</h4>
                                     </div>
-                                    <p className="text-gray-700">{formatDate(selectedBooking.bookingDate)}</p>
+                                    <p className="text-gray-700">{formatDate(selectedBooking.scheduledDate)}</p>
                                 </div>
                                 <div className="bg-gray-50 rounded-lg p-4">
                                     <div className="flex items-center mb-2">
                                         <Clock className="w-5 h-5 text-gray-400 mr-2" />
                                         <h4 className="font-semibold text-gray-900">Time</h4>
                                     </div>
-                                    <p className="text-gray-700">{formatTime(selectedBooking.bookingTime)}</p>
+                                    <p className="text-gray-700">{formatTime(selectedBooking.scheduledTime)}</p>
                                 </div>
                             </div>
 

@@ -29,6 +29,7 @@ const MyBookings = ({ onNavigate }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [cancellingId, setCancellingId] = useState(null);
     const [reviewModalData, setReviewModalData] = useState(null);
+    const [selectedBooking, setSelectedBooking] = useState(null);
 
     const { 
         bookings, 
@@ -273,7 +274,7 @@ const MyBookings = ({ onNavigate }) => {
                                                 </>
                                             )}
                                             <button
-                                                onClick={() => onNavigate && onNavigate('provider', { id: booking.providerId })}
+                                                onClick={() => setSelectedBooking(booking)}
                                                 className="px-4 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
                                             >
                                                 View Details
@@ -348,6 +349,166 @@ const MyBookings = ({ onNavigate }) => {
                     createReview={createReview}
                 />
             )}
+
+            {/* Booking Detail Modal */}
+            {selectedBooking && (
+                <BookingDetailModal
+                    booking={selectedBooking}
+                    onClose={() => setSelectedBooking(null)}
+                    onViewProvider={() => {
+                        setSelectedBooking(null);
+                        onNavigate && onNavigate('provider', { id: selectedBooking.providerId });
+                    }}
+                    formatDate={formatDate}
+                    formatTime={formatTime}
+                    getStatusConfig={getStatusConfig}
+                    getPlaceholderAvatar={getPlaceholderAvatar}
+                />
+            )}
+        </div>
+    );
+};
+
+// Booking Detail Modal Component
+const BookingDetailModal = ({ booking, onClose, onViewProvider, formatDate, formatTime, getStatusConfig, getPlaceholderAvatar }) => {
+    const statusConfig = getStatusConfig(booking.status?.toLowerCase());
+    const StatusIcon = statusConfig.icon;
+
+    return (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+                {/* Header */}
+                <div className="p-6 border-b border-slate-100">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-xl font-bold text-slate-800">Booking Details</h2>
+                        <button
+                            onClick={onClose}
+                            className="p-2 hover:bg-slate-100 rounded-full transition"
+                        >
+                            <X className="w-5 h-5 text-slate-500" />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Content */}
+                <div className="p-6 space-y-6">
+                    {/* Status Badge */}
+                    <div className="flex justify-center">
+                        <span className={`px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 ${statusConfig.color}`}>
+                            <StatusIcon className="w-5 h-5" />
+                            {statusConfig.label}
+                        </span>
+                    </div>
+
+                    {/* Provider Info */}
+                    <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl">
+                        <img
+                            src={booking.providerAvatar || booking.providerAvatarUrl || getPlaceholderAvatar(booking.providerName)}
+                            alt={booking.providerName}
+                            className="w-16 h-16 rounded-xl object-cover"
+                        />
+                        <div className="flex-1">
+                            <h3 className="font-bold text-slate-800">{booking.providerName}</h3>
+                            <div className="flex items-center gap-1 text-sm text-slate-500">
+                                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                                <span>{booking.providerRating?.toFixed(1) || 'New'}</span>
+                            </div>
+                            {booking.providerPhone && (
+                                <div className="flex items-center gap-1 text-sm text-slate-500 mt-1">
+                                    <Phone className="w-4 h-4" />
+                                    <span>{booking.providerPhone}</span>
+                                </div>
+                            )}
+                        </div>
+                        <button
+                            onClick={onViewProvider}
+                            className="px-3 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
+                        >
+                            View Profile
+                        </button>
+                    </div>
+
+                    {/* Booking Info Grid */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="p-4 bg-slate-50 rounded-xl">
+                            <div className="flex items-center gap-2 text-slate-500 text-sm mb-1">
+                                <Calendar className="w-4 h-4" />
+                                Date
+                            </div>
+                            <div className="font-semibold text-slate-800">
+                                {formatDate(booking.bookingDate || booking.scheduledDate)}
+                            </div>
+                        </div>
+                        <div className="p-4 bg-slate-50 rounded-xl">
+                            <div className="flex items-center gap-2 text-slate-500 text-sm mb-1">
+                                <Clock className="w-4 h-4" />
+                                Time
+                            </div>
+                            <div className="font-semibold text-slate-800">
+                                {formatTime(booking.bookingTime || booking.scheduledTime)}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Service Details */}
+                    <div className="p-4 bg-indigo-50 rounded-xl">
+                        <div className="text-indigo-600 text-sm font-medium mb-1">Service</div>
+                        <div className="text-lg font-bold text-slate-800">{booking.serviceName}</div>
+                        <div className="text-2xl font-bold text-indigo-600 mt-2">
+                            ₹{booking.price || booking.totalAmount || booking.amount || 0}
+                        </div>
+                    </div>
+
+                    {/* Address */}
+                    {(booking.address || booking.serviceAddress) && (
+                        <div className="p-4 bg-slate-50 rounded-xl">
+                            <div className="flex items-center gap-2 text-slate-500 text-sm mb-1">
+                                <MapPin className="w-4 h-4" />
+                                Service Address
+                            </div>
+                            <div className="font-medium text-slate-800">
+                                {booking.address || booking.serviceAddress}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Notes */}
+                    {(booking.notes || booking.customerNotes) && (
+                        <div className="p-4 bg-slate-50 rounded-xl">
+                            <div className="text-slate-500 text-sm mb-1">Your Notes</div>
+                            <div className="text-slate-800 italic">
+                                "{booking.notes || booking.customerNotes}"
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Timestamps */}
+                    <div className="text-xs text-slate-400 space-y-1">
+                        {booking.createdAt && (
+                            <div>Booked on: {formatDate(booking.createdAt)}</div>
+                        )}
+                        {booking.completedAt && (
+                            <div>Completed on: {formatDate(booking.completedAt)}</div>
+                        )}
+                        {booking.cancelledAt && (
+                            <div>Cancelled on: {formatDate(booking.cancelledAt)}</div>
+                        )}
+                        {booking.cancellationReason && (
+                            <div className="text-red-500">Reason: {booking.cancellationReason}</div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Footer */}
+                <div className="p-6 border-t border-slate-100">
+                    <button
+                        onClick={onClose}
+                        className="w-full py-3 bg-slate-100 text-slate-700 rounded-xl font-semibold hover:bg-slate-200 transition"
+                    >
+                        Close
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };
