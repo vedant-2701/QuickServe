@@ -109,7 +109,7 @@ const CustomerHeader = ({ user, onMenuToggle, onNavigate, onLogout }) => {
                     {/* Right: Notifications & Profile */}
                     <div className="flex items-center gap-2">
                         {/* Notifications */}
-                        <div className="relative">
+                        {/* <div className="relative">
                             <button
                                 onClick={() => {
                                     setShowNotifications(!showNotifications);
@@ -125,7 +125,6 @@ const CustomerHeader = ({ user, onMenuToggle, onNavigate, onLogout }) => {
                                 )}
                             </button>
 
-                            {/* Notifications Dropdown */}
                             {showNotifications && (
                                 <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 z-50">
                                     <div className="p-4 border-b border-slate-100">
@@ -162,7 +161,7 @@ const CustomerHeader = ({ user, onMenuToggle, onNavigate, onLogout }) => {
                                     </div>
                                 </div>
                             )}
-                        </div>
+                        </div> */}
 
                         {/* Profile */}
                         <div className="relative">
@@ -214,7 +213,7 @@ const CustomerHeader = ({ user, onMenuToggle, onNavigate, onLogout }) => {
                                             <Calendar className="w-5 h-5" />
                                             <span>My Bookings</span>
                                         </button>
-                                        <button
+                                        {/* <button
                                             onClick={() => {
                                                 onNavigate && onNavigate('favorites');
                                                 setShowProfileMenu(false);
@@ -223,8 +222,8 @@ const CustomerHeader = ({ user, onMenuToggle, onNavigate, onLogout }) => {
                                         >
                                             <Heart className="w-5 h-5" />
                                             <span>Saved Providers</span>
-                                        </button>
-                                        <button
+                                        </button> */}
+                                        {/* <button
                                             onClick={() => {
                                                 onNavigate && onNavigate('settings');
                                                 setShowProfileMenu(false);
@@ -233,7 +232,7 @@ const CustomerHeader = ({ user, onMenuToggle, onNavigate, onLogout }) => {
                                         >
                                             <Settings className="w-5 h-5" />
                                             <span>Settings</span>
-                                        </button>
+                                        </button> */}
                                     </div>
                                     <div className="p-2 border-t border-slate-100">
                                         <button

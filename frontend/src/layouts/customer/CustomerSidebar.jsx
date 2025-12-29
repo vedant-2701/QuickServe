@@ -16,14 +16,14 @@ const CustomerSidebar = ({ currentPage, onNavigate, isOpen, onClose }) => {
         { id: 'home', label: 'Home', icon: Home },
         { id: 'browse', label: 'Browse Services', icon: Search },
         { id: 'bookings', label: 'My Bookings', icon: Calendar },
-        { id: 'favorites', label: 'Saved Providers', icon: Heart },
-        { id: 'messages', label: 'Messages', icon: MessageCircle, badge: 3 },
+        // { id: 'favorites', label: 'Saved Providers', icon: Heart },
+        // { id: 'messages', label: 'Messages', icon: MessageCircle, badge: 3 },
     ];
 
     const secondaryItems = [
         { id: 'profile', label: 'My Profile', icon: User },
-        { id: 'settings', label: 'Settings', icon: Settings },
-        { id: 'help', label: 'Help & Support', icon: HelpCircle },
+        // { id: 'settings', label: 'Settings', icon: Settings },
+        // { id: 'help', label: 'Help & Support', icon: HelpCircle },
     ];
 
     return (

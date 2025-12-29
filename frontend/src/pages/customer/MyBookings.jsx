@@ -169,7 +169,7 @@ const MyBookings = ({ onNavigate }) => {
                     { label: 'Total Bookings', value: bookings.length, color: 'bg-indigo-50 text-indigo-600' },
                     { label: 'Pending', value: bookings.filter(b => b.status?.toLowerCase() === 'pending').length, color: 'bg-yellow-50 text-yellow-600' },
                     { label: 'Completed', value: bookings.filter(b => b.status?.toLowerCase() === 'completed').length, color: 'bg-green-50 text-green-600' },
-                    { label: 'Upcoming', value: bookings.filter(b => isUpcoming(b.bookingDate || b.scheduledDate) && b.status?.toLowerCase() !== 'cancelled').length, color: 'bg-blue-50 text-blue-600' },
+                    // { label: 'Upcoming', value: bookings.filter(b => isUpcoming(b.bookingDate || b.scheduledDate) && b.status?.toLowerCase() !== 'cancelled').length, color: 'bg-blue-50 text-blue-600' },
                 ].map((stat, index) => (
                     <div key={index} className={`${stat.color} rounded-xl p-4`}>
                         <div className="text-2xl font-bold">{stat.value}</div>
